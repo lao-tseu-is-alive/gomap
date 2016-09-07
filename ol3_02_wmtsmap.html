@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="lib/ol3/css/ol.css">
+    <script src="lib/proj4js/2.2.2/proj4.js"></script>
+    <title>ol3_02 wmts map</title>
+    <script src="lib/proj4js/2.2.2/EPSG21781.js"></script>
+    <script src="lib/ol3/build/ol.js"></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script type="text/javascript">
+
+    var lon = 537912.8; //VARIABLE_X
+    var lat = 152090.7; //VARIABLE_Y
+    var zoom_level = 8; //VARIABLE_ZOOM
+    var base_wmts_url = "https://map.lausanne.ch/tiles";
+    var position_Lausanne = [lon, lat];
+    var MAX_EXTENT = [420000, 30000, 900000, 350000];
+    var MAX_EXTENT_LIDAR = [532500, 149000, 545625, 161000]; //projet lidar
+    var swissProjection = new ol.proj.Projection({
+        code: 'EPSG:21781',
+        // The extent is used to determine zoom level 0. Recommended values for a
+        // projection's validity extent can be found at http://epsg.io/.
+        //extent: [485869.5728, 76443.1884, 837076.5648, 299941.7864],
+        extent: MAX_EXTENT,
+        units: 'm'
+    });
+    var RESOLUTIONS = [50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05];
+    var wmtsLausanneSource = function (layer, options) {
+        var resolutions = options.resolutions ? options.resolutions : RESOLUTIONS;
+        var tileGrid = new ol.tilegrid.WMTS({
+            origin: [420000, 350000],
+            resolutions: resolutions,
+            matrixIds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        });
+        var extension = options.format || 'png';
+        var timestamp = options['timestamps'];
+        return new ol.source.WMTS(/** @type {olx.source.WMTSOptions} */({
+            //crossOrigin: 'anonymous',
+            attributions: [new ol.Attribution({
+                html: '&copy; ' +
+                '<a href="http://www.geo.admin.ch/internet/geoportal/' +
+                'en/home.html">' +
+                'Pixelmap / geo.admin.ch</a>'
+            })],
+
+            url: (base_wmts_url + '/1.0.0/{Layer}/default/' +
+            timestamp + '/swissgrid_05/' +
+            '{TileMatrix}/{TileRow}/{TileCol}.').replace('http:', location.protocol) + extension,
+            tileGrid: tileGrid,
+            layer: options['serverLayerName'] ? options['serverLayerName'] : layer,
+            requestEncoding: 'REST'
+        }));
+    };
+
+    var src = wmtsLausanneSource('fonds_geo_osm_bdcad_couleur', {
+        timestamps: [2015],
+        format: 'png'
+    });
+
+    var layer = new ol.layer.Tile({
+        source: src
+
+
+    });
+
+    var projection = ol.proj.get('EPSG:21781');
+    var projectionExtent = MAX_EXTENT;
+
+    var map = new ol.Map({
+        target: 'map',
+        controls: [
+            //Define the default controls
+            new ol.control.Zoom(),
+            new ol.control.Rotate(),
+            //Define some new controls
+            new ol.control.ZoomSlider(),
+            new ol.control.MousePosition(),
+            new ol.control.ScaleLine()
+        ],
+        layers: [layer],
+        view: new ol.View({
+            projection: swissProjection,
+            center: position_Lausanne,
+            zoom: 8
+        })
+    });
+</script>
+</body>
+</html>
