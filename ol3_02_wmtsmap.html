@@ -49,9 +49,8 @@
             //crossOrigin: 'anonymous',
             attributions: [new ol.Attribution({
                 html: '&copy; ' +
-                '<a href="http://www.geo.admin.ch/internet/geoportal/' +
-                'en/home.html">' +
-                'Pixelmap / geo.admin.ch</a>'
+                '<a href="http://www.lausanne.ch/cadastre>' +
+                'Cadastre / www.lausanne.ch</a>'
             })],
 
             url: (base_wmts_url + '/1.0.0/{Layer}/default/' +
@@ -70,8 +69,6 @@
 
     var layer = new ol.layer.Tile({
         source: src
-
-
     });
 
     var projection = ol.proj.get('EPSG:21781');
