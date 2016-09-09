@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
-    <link rel="stylesheet" href="lib/ol3/css/ol.css">
-    <script src="lib/proj4js/2.2.2/proj4.js"></script>
     <title>ol3_02 wmts map</title>
+    <!-- let's take all we can from CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.18.2/ol.css">
+    <script src="lib/proj4js/2.2.2/proj4.js"></script>
     <script src="lib/proj4js/2.2.2/EPSG21781.js"></script>
-    <script src="lib/ol3/build/ol-debug.js"></script>
-    <!-- Latest compiled and minified CSS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.18.2/ol.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
           integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous"></script>
@@ -35,86 +34,19 @@
             font-size: 12px;
         }
     </style>
+
 </head>
 <body>
 <div id="map"></div>
+<script src="js/goeland_ol3_wmts.js"></script>
 <script type="text/javascript">
     var lon = 537912.8; //VARIABLE_X
     var lat = 152090.7; //VARIABLE_Y
     var zoom_level = 4; //VARIABLE_ZOOM
-    var base_wmts_url = "https://map.lausanne.ch/tiles";
     var position_Lausanne = [lon, lat];
-    //var MAX_EXTENT = [420000, 30000, 900000, 350000];
-    var MAX_EXTENT_LIDAR = [532500, 149000, 545625, 161000]; //projet lidar
-    var swissProjection = new ol.proj.Projection({
-        code: 'EPSG:21781',
-        extent: MAX_EXTENT_LIDAR,
-        units: 'm'
-    });
+    init_map('map', position_Lausanne, zoom_level);
 
-    var RESOLUTIONS = [50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05];
-    var wmtsLausanneSource = function (layer, options) {
-        var resolutions = options.resolutions ? options.resolutions : RESOLUTIONS;
-        var tileGrid = new ol.tilegrid.WMTS({
-            origin: [420000, 350000],
-            resolutions: resolutions,
-            matrixIds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        });
-        var extension = options.format || 'png';
-        var timestamp = options['timestamps'];
-        return new ol.source.WMTS(/** @type {olx.source.WMTSOptions} */({
-            //crossOrigin: 'anonymous',
-            attributions: [new ol.Attribution({
-                html: '&copy; ' +
-                '<a href="http://www.lausanne.ch/cadastre>' +
-                'Cadastre / www.lausanne.ch</a>'
-            })],
+</script>
 
-            url: (base_wmts_url + '/1.0.0/{Layer}/default/' +
-            timestamp + '/swissgrid_05/' +
-            '{TileMatrix}/{TileRow}/{TileCol}.').replace('http:', location.protocol) + extension,
-            tileGrid: tileGrid,
-            layer: options['serverLayerName'] ? options['serverLayerName'] : layer,
-            requestEncoding: 'REST'
-        }));
-    };
-
-    var src = wmtsLausanneSource('fonds_geo_osm_bdcad_couleur', {
-        timestamps: [2015],
-        format: 'png'
-    });
-
-    var layer = new ol.layer.Tile({
-        source: src
-    });
-
-    var my_view = new ol.View({
-        projection: swissProjection,
-        center: position_Lausanne,
-        zoom: zoom_level,
-        minZoom: 1,
-        maxZoom: 10,
-        extent: MAX_EXTENT_LIDAR
-    });
-    var mouse_position_control = new ol.control.MousePosition({
-        coordinateFormat: ol.coordinate.createStringXY(2),
-        projection: 'EPSG:21784'
-    });
-    var map = new ol.Map({
-        target: 'map',
-        controls: [
-            new ol.control.Zoom(),
-            new ol.control.MousePosition({
-                coordinateFormat: ol.coordinate.createStringXY(2),
-                projection: 'EPSG:21784'
-            }),
-            new ol.control.Rotate(),
-            new ol.control.ZoomSlider(),
-            new ol.control.ScaleLine()
-        ], layers: [layer],
-        view: my_view
-    })
-
-    </script>
-    </body>
-    </html>
+</body>
+</html>
