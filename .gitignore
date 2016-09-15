@@ -3,6 +3,9 @@ logs
 *.log
 npm-debug.log*
 
+# all local node modules
+/node_modules
+
 # Runtime data
 pids
 *.pid
@@ -36,3 +39,11 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 .idea/
+/lib/mastering_openlayers3-master/
+/lib/OpenLayers3xCookbook_code/
+/lib/v3.18.2/
+/doc/
+/ol3_02_geoadmin_wmts.html
+/lib/ol3*
+/bundle.js
+/bundle_browserify.js

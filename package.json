@@ -1,0 +1,47 @@
+{
+  "name": "gomap",
+  "version": "1.0.0",
+  "description": "goeland map with openlayers 3 custom build",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc && concurrently \"npm run tsc:w\" \"npm run lite\" ",
+    "lite": "lite-server",
+    "postinstall": "typings install",
+    "tsc": "tsc",
+    "tsc:w": "tsc -w",
+    "typings": "typings",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lao-tseu-is-alive/gomap.git"
+  },
+  "keywords": [
+    "goeland",
+    "openlayers",
+    "ol3",
+    "clojure"
+  ],
+  "author": "cgil",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/lao-tseu-is-alive/gomap/issues"
+  },
+  "homepage": "https://github.com/lao-tseu-is-alive/gomap#readme",
+  "dependencies": {
+    "openlayers": "^3.18.2"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "lite-server": "^2.2.2",
+    "webpack": "^1.12.13",
+    "browserify": "^13.0.0",
+    "concurrently": "^2.2.0",
+    "typescript": "^2.0.2",
+    "typings":"^1.3.2"
+  },
+  "jshintConfig": {
+    "maxerr"        : 50,
+    "esversion": 5
+  }
+}

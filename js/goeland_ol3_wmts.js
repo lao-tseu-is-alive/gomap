@@ -11,7 +11,7 @@ var swissProjection = new ol.proj.Projection({
 var RESOLUTIONS = [50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05];
 function wmtsLausanneSource(layer, options) {
     'use strict';
-    var resolutions = (Array.isArray(options.resolutions))  ? options.resolutions : RESOLUTIONS;
+    var resolutions = (Array.isArray(options.resolutions)) ? options.resolutions : RESOLUTIONS;
     var tileGrid = new ol.tilegrid.WMTS({
         origin: [420000, 350000],
         resolutions: resolutions,
@@ -24,16 +24,13 @@ function wmtsLausanneSource(layer, options) {
         attributions: [new ol.Attribution({
             html: "&copy;<a href='http://www.lausanne.ch/cadastre>Cadastre'> www.lausanne.ch</a>"
         })],
-
-        url: (base_wmts_url + '/1.0.0/{Layer}/default/' +
-        timestamp + '/swissgrid_05/' +
-        '{TileMatrix}/{TileRow}/{TileCol}.').replace('http:', location.protocol) + extension,
+        url: (base_wmts_url + '/1.0.0/{Layer}/default/' + timestamp + '/swissgrid_05/' +
+                '{TileMatrix}/{TileRow}/{TileCol}.').replace('http:', location.protocol) + extension,
         tileGrid: tileGrid,
         layer: options.serverLayerName ? options.serverLayerName : layer,
         requestEncoding: 'REST'
     }));
 }
-
 
 var src_pv_color = wmtsLausanneSource('fonds_geo_osm_bdcad_couleur', {
     timestamps: [2015],
