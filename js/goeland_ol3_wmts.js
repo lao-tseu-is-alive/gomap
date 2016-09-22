@@ -1,7 +1,10 @@
 /*global ol*/
-var MAX_EXTENT_LIDAR = [532500, 149000, 545625, 161000]; //projet lidar
+/*jshint
+ expr: true
+ */
+var MAX_EXTENT_LIDAR = [532500, 149000, 545625, 161000]; // lidar 2012
 var map; //ol3 map
-var base_wmts_url = "https://map.lausanne.ch/tiles";
+var base_wmts_url = "https://map.lausanne.ch/tiles"; //valid on internet
 var swissProjection = new ol.proj.Projection({
     code: 'EPSG:21781',
     extent: MAX_EXTENT_LIDAR,
@@ -9,9 +12,18 @@ var swissProjection = new ol.proj.Projection({
 });
 
 var RESOLUTIONS = [50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05];
+/**
+ * allow to retrieve a valid OpenLayers WMTS source object
+ * @param layer:string the name of the WMTS layer
+ * @param options
+ * @returns {ol.source.WMTS}
+ */
 function wmtsLausanneSource(layer, options) {
     'use strict';
-    var resolutions = (Array.isArray(options.resolutions)) ? options.resolutions : RESOLUTIONS;
+    var resolutions = RESOLUTIONS;
+    if (Array.isArray(options.resolutions)) {
+        resolutions = options.resolutions;
+    }
     var tileGrid = new ol.tilegrid.WMTS({
         origin: [420000, 350000],
         resolutions: resolutions,
@@ -19,17 +31,19 @@ function wmtsLausanneSource(layer, options) {
     });
     var extension = options.format || 'png';
     var timestamp = options.timestamps;
-    return new ol.source.WMTS(/** @type {olx.source.WMTSOptions} */({
+    var url = base_wmts_url + '/1.0.0/{Layer}/default/' + timestamp + '/swissgrid_05/{TileMatrix}/{TileRow}/{TileCol}.' + extension;
+    url = url.replace('http:', location.protocol);
+    //noinspection ES6ModulesDependencies
+    return new ol.source.WMTS( /** @type {olx.source.WMTSOptions} */{
         //crossOrigin: 'anonymous',
         attributions: [new ol.Attribution({
             html: "&copy;<a href='http://www.lausanne.ch/cadastre>Cadastre'> www.lausanne.ch</a>"
         })],
-        url: (base_wmts_url + '/1.0.0/{Layer}/default/' + timestamp + '/swissgrid_05/' +
-                '{TileMatrix}/{TileRow}/{TileCol}.').replace('http:', location.protocol) + extension,
+        url: url,
         tileGrid: tileGrid,
-        layer: options.serverLayerName ? options.serverLayerName : layer,
+        layer: layer,
         requestEncoding: 'REST'
-    }));
+    });
 }
 
 var src_pv_color = wmtsLausanneSource('fonds_geo_osm_bdcad_couleur', {
@@ -43,7 +57,7 @@ var layer_pv_color = new ol.layer.Tile({
 
 
 function init_map(str_map_id, position, zoom_level) {
-
+    "use strict";
     var my_view = new ol.View({
         projection: swissProjection,
         center: position,
@@ -58,7 +72,8 @@ function init_map(str_map_id, position, zoom_level) {
     });
     map = new ol.Map({
         target: str_map_id,
-        controls: [new ol.control.Zoom(),
+        controls: [
+            new ol.control.Zoom(),
             mouse_position_control,
             new ol.control.Rotate(),
             new ol.control.ZoomSlider(),
@@ -67,5 +82,4 @@ function init_map(str_map_id, position, zoom_level) {
         layers: [layer_pv_color],
         view: my_view
     });
-
 }

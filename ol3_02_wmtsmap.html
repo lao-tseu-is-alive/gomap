@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
     <title>ol3_02 wmts map</title>
-    <!-- let's take all we can from CDN -->
+    <!-- let's use CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.18.2/ol.css">
     <script src="lib/proj4js/2.2.2/proj4.js"></script>
     <script src="lib/proj4js/2.2.2/EPSG21781.js"></script>
@@ -37,7 +37,9 @@
 
 </head>
 <body>
-<div id="map"></div>
+<div id="map">
+    <noscript>You need javascript to use this page</noscript>
+</div>
 <script src="js/goeland_ol3_wmts.js"></script>
 <script type="text/javascript">
     var lon = 537912.8; //VARIABLE_X
