@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/lao-tseu-is-alive/gomap#readme",
   "dependencies": {
+    "ol3-layerswitcher": "^1.1.2",
     "openlayers": "^3.18.2"
   },
   "devDependencies": {

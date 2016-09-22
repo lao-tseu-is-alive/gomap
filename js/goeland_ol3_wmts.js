@@ -13,7 +13,7 @@ var swissProjection = new ol.proj.Projection({
 
 var RESOLUTIONS = [50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05];
 /**
- * allow to retrieve a valid OpenLayers WMTS source object
+ * Allow to retrieve a valid OpenLayers WMTS source object
  * @param layer:string the name of the WMTS layer
  * @param options
  * @returns {ol.source.WMTS}
@@ -34,7 +34,7 @@ function wmtsLausanneSource(layer, options) {
     var url = base_wmts_url + '/1.0.0/{Layer}/default/' + timestamp + '/swissgrid_05/{TileMatrix}/{TileRow}/{TileCol}.' + extension;
     url = url.replace('http:', location.protocol);
     //noinspection ES6ModulesDependencies
-    return new ol.source.WMTS( /** @type {olx.source.WMTSOptions} */{
+    return new ol.source.WMTS(/** @type {olx.source.WMTSOptions} */{
         //crossOrigin: 'anonymous',
         attributions: [new ol.Attribution({
             html: "&copy;<a href='http://www.lausanne.ch/cadastre>Cadastre'> www.lausanne.ch</a>"
@@ -46,14 +46,43 @@ function wmtsLausanneSource(layer, options) {
     });
 }
 
-var src_pv_color = wmtsLausanneSource('fonds_geo_osm_bdcad_couleur', {
-    timestamps: [2015],
-    format: 'png'
-});
-
-var layer_pv_color = new ol.layer.Tile({
-    source: src_pv_color
-});
+var vdl_wmts = [];
+vdl_wmts.push(new ol.layer.Tile({
+    title: 'Plan ville couleur',
+    type: 'base',
+    visible: true,
+    source: wmtsLausanneSource('fonds_geo_osm_bdcad_couleur', {
+        timestamps: [2015],
+        format: 'png'
+    })
+}));
+vdl_wmts.push(new ol.layer.Tile({
+    title: 'Plan cadastral (gris)',
+    type: 'base',
+    visible: false,
+    source: wmtsLausanneSource('fonds_geo_osm_bdcad_gris', {
+        timestamps: [2015],
+        format: 'png'
+    })
+}));
+vdl_wmts.push(new ol.layer.Tile({
+    title: 'Orthophoto 2012',
+    type: 'base',
+    visible: false,
+    source: wmtsLausanneSource('orthophotos_ortho_lidar_2012', {
+        timestamps: [2012],
+        format: 'png'
+    })
+}));
+vdl_wmts.push(new ol.layer.Tile({
+    title: 'Carte Nationale',
+    type: 'base',
+    visible: false,
+    source: wmtsLausanneSource('fonds_geo_carte_nationale_msgroup', {
+        timestamps: [2014],
+        format: 'png'
+    })
+}));
 
 
 function init_map(str_map_id, position, zoom_level) {
@@ -68,7 +97,7 @@ function init_map(str_map_id, position, zoom_level) {
     });
     var mouse_position_control = new ol.control.MousePosition({
         coordinateFormat: ol.coordinate.createStringXY(2),
-        projection: 'EPSG:21784'
+        projection: 'EPSG:21781'
     });
     map = new ol.Map({
         target: str_map_id,
@@ -79,7 +108,7 @@ function init_map(str_map_id, position, zoom_level) {
             new ol.control.ZoomSlider(),
             new ol.control.ScaleLine()
         ],
-        layers: [layer_pv_color],
+        layers: vdl_wmts,
         view: my_view
     });
 }
