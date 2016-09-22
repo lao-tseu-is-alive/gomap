@@ -13,15 +13,24 @@ from a performance point of view as you can see on Google PageSpeed it is not op
 [Google PageSpeed Test Results](https://developers.google.com/speed/pagespeed/insights/?url=https%3A%2F%2Frawgit.com%2Flao-tseu-is-alive%2Fgomap%2Fmaster%2Fol3_02_wmtsmap.html&tab=desktop)
  
 We can try to offer the same functionality but in a more cleaner way using  [browserify](http://browserify.org/)
-basic usage is like this : 
+basic usage is like this as explained in [this page](http://openlayers.org/en/latest/doc/tutorials/browserify.html) : 
 
 ./node_modules/.bin/browserify app.js -o bundle.js
 
 Next posssible step is to make a custom build of the OpenLayers library using only what we really need,
 as explained on the [OpenLayers 3 website](http://openlayers.org/en/latest/doc/tutorials/custom-builds.html) 
 
+or better to [compile our application and OpenLayers 3 together](http://openlayers.org/en/latest/doc/tutorials/closure.html)
+
+here is the result of custom compiling the above example ol3_02_wmtsmap.html
+[Google PageSpeed after compiling](https://developers.google.com/speed/pagespeed/insights/?url=http%3A%2F%2Fcgtest.trouvl.info%2Fapp.html&tab=mobile)
+
 
 ## Some Openlayers 3 useful links
+[OpenLayers 3 Examples](http://openlayers.org/en/latest/examples/)
+
 [Creating custom builds of OL3](http://openlayers.org/en/latest/doc/tutorials/custom-builds.html)
 
 [Discussion on OpenLayers 3 about using Browserify](https://github.com/openlayers/ol3/issues/3162)
+
+[OpenLayers 3 LayerSwitcher plugin](https://github.com/walkermatt/ol3-layerswitcher)
