@@ -1,3 +1,4 @@
+//require('google-closure-library');
 /**
  * Created by cgil on 9/7/16.
  */
@@ -22,13 +23,14 @@ goog.require('ol.source.WMTS');
 goog.require('ol.tilegrid.WMTS');
 
 var MAX_EXTENT_LIDAR = [532500, 149000, 545625, 161000]; // lidar 2012
-var map; //ol3 map
 var base_wmts_url = 'https://map.lausanne.ch/tiles'; //valid on internet
+
 var swissProjection = new ol.proj.Projection({
     code: 'EPSG:21781',
     extent: MAX_EXTENT_LIDAR,
     units: 'm'
 });
+ol.proj.addProjection(swissProjection);
 
 var RESOLUTIONS = [50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05];
 /**
@@ -106,30 +108,40 @@ vdl_wmts.push(new ol.layer.Tile({
 }));
 
 var mouse_position_control = new ol.control.MousePosition({
-    //coordinateFormat: ol.coordinate.createStringXY(2),
+    coordinateFormat: ol.coordinate.createStringXY(2),
     projection: 'EPSG:21781'
 });
 
-/**
- * @type {ol.Map}
- */
 
-app.map = new ol.Map({
-    target: 'map',
-    layers: vdl_wmts,
-    controls: [
-        new ol.control.Zoom(),
-        mouse_position_control,
-        new ol.control.Rotate(),
-        new ol.control.ZoomSlider(),
-        new ol.control.ScaleLine()
-    ],
-    view: new ol.View({
-        projection: swissProjection,
-        center: [537892.8, 152095.7],
-        zoom: 4,
-        minZoom: 1,
-        maxZoom: 10,
-        extent: MAX_EXTENT_LIDAR
-    })
-});
+/**
+ * @param {string} str_map_id
+ * @param {array} position
+ * @param {number} zoom_level
+ * @return {ol.Map}
+ */
+app.init_map = function(str_map_id, position, zoom_level) {
+    'use strict';
+    /**     * @type {ol.Map}
+     */
+    app.map = new ol.Map({
+        target: str_map_id,
+        layers: vdl_wmts,
+        controls: [
+            new ol.control.Zoom(),
+            mouse_position_control,
+            new ol.control.Rotate(),
+            new ol.control.ZoomSlider(),
+            new ol.control.ScaleLine()
+        ],
+        view: new ol.View({
+            projection: swissProjection,
+            center: position,
+            zoom: zoom_level,
+            minZoom: 1,
+            maxZoom: 10,
+            extent: MAX_EXTENT_LIDAR
+        })
+    });
+    return app.map;
+};
+window['init_map'] = app.init_map;

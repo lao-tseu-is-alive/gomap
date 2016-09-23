@@ -36,6 +36,7 @@
     "browserify": "^13.0.0",
     "concurrently": "^2.2.0",
     "eslint": "^3.5.0",
+    "google-closure-library": "^20160911.0.0",
     "gulp": "^3.9.1",
     "lite-server": "^2.2.2",
     "typescript": "^2.0.2",

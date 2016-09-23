@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>ol3_02 wmts map</title>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+</head>
+<body>
+<div id="loader_message">
+    <p>Loading the map...<br>
+    <p>Chargement de la carte ...<br>
+        <br>
+    <p>Please be patient
+</div>
+<div id="map">
+    <noscript>You need javascript to use this page</noscript>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.18.2/ol.js" async></script>
+<!-- pour la projection suisse -->
+<script src="lib/proj4js/2.2.2/proj4.js" async></script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('#EVENT document DOMContentLoaded : document.readyState=', document.readyState);
+    });
+    window.addEventListener('load', function () {
+        console.log('#EVENT window load: document.readyState=', document.readyState);
+        document.getElementById('loader_message').style.display = 'none';
+        proj4.defs("EPSG:21781", "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=674.4,15.1,405.3,0,0,0,0 +units=m +no_defs");
+
+        /*global ol*/
+        /*jshint
+         expr: true
+         */
+        var MAX_EXTENT_LIDAR = [532500, 149000, 545625, 161000]; // lidar 2012
+        var map; //ol3 map
+        var base_wmts_url = "https://map.lausanne.ch/tiles"; //valid on internet
+        var swissProjection = new ol.proj.Projection({
+            code: 'EPSG:21781',
+            extent: MAX_EXTENT_LIDAR,
+            units: 'm'
+        });
+
+        var RESOLUTIONS = [50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05];
+
+        /**
+         * Allow to retrieve a valid OpenLayers WMTS source object
+         * @param layer:string the name of the WMTS layer
+         * @param options
+         * @returns {ol.source.WMTS}
+         */
+        function wmtsLausanneSource(layer, options) {
+            'use strict';
+            var resolutions = RESOLUTIONS;
+            if (Array.isArray(options.resolutions)) {
+                resolutions = options.resolutions;
+            }
+            var tileGrid = new ol.tilegrid.WMTS({
+                origin: [420000, 350000],
+                resolutions: resolutions,
+                matrixIds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+            });
+            var extension = options.format || 'png';
+            var timestamp = options.timestamps;
+            var url = base_wmts_url + '/1.0.0/{Layer}/default/' + timestamp + '/swissgrid_05/{TileMatrix}/{TileRow}/{TileCol}.' + extension;
+            url = url.replace('http:', location.protocol);
+            //noinspection ES6ModulesDependencies
+            return new ol.source.WMTS(/** @type {olx.source.WMTSOptions} */{
+                //crossOrigin: 'anonymous',
+                attributions: [new ol.Attribution({
+                    html: "&copy;<a href='http://www.lausanne.ch/cadastre>Cadastre'> www.lausanne.ch</a>"
+                })],
+                url: url,
+                tileGrid: tileGrid,
+                layer: layer,
+                requestEncoding: 'REST'
+            });
+        }
+
+        var vdl_wmts = [];
+        vdl_wmts.push(new ol.layer.Tile({
+            title: 'Plan ville couleur',
+            type: 'base',
+            visible: true,
+            source: wmtsLausanneSource('fonds_geo_osm_bdcad_couleur', {
+                timestamps: [2015],
+                format: 'png'
+            })
+        }));
+        vdl_wmts.push(new ol.layer.Tile({
+            title: 'Plan cadastral (gris)',
+            type: 'base',
+            visible: false,
+            source: wmtsLausanneSource('fonds_geo_osm_bdcad_gris', {
+                timestamps: [2015],
+                format: 'png'
+            })
+        }));
+        vdl_wmts.push(new ol.layer.Tile({
+            title: 'Orthophoto 2012',
+            type: 'base',
+            visible: false,
+            source: wmtsLausanneSource('orthophotos_ortho_lidar_2012', {
+                timestamps: [2012],
+                format: 'png'
+            })
+        }));
+        vdl_wmts.push(new ol.layer.Tile({
+            title: 'Carte Nationale',
+            type: 'base',
+            visible: false,
+            source: wmtsLausanneSource('fonds_geo_carte_nationale_msgroup', {
+                timestamps: [2014],
+                format: 'png'
+            })
+        }));
+
+
+        function init_map(str_map_id, position, zoom_level) {
+            "use strict";
+            var my_view = new ol.View({
+                projection: swissProjection,
+                center: position,
+                zoom: zoom_level,
+                minZoom: 1,
+                maxZoom: 10,
+                extent: MAX_EXTENT_LIDAR
+            });
+            var mouse_position_control = new ol.control.MousePosition({
+                coordinateFormat: ol.coordinate.createStringXY(2),
+                projection: 'EPSG:21781'
+            });
+            map = new ol.Map({
+                target: str_map_id,
+                controls: [
+                    new ol.control.Zoom(),
+                    mouse_position_control,
+                    new ol.control.Rotate(),
+                    new ol.control.ZoomSlider(),
+                    new ol.control.ScaleLine()
+                ],
+                layers: vdl_wmts,
+                view: my_view
+            });
+        }
+
+        var lon = 537892.8; //VARIABLE_X
+        var lat = 152095.7; //VARIABLE_Y
+        var zoom_level = 4; //VARIABLE_ZOOM
+        var position_Lausanne = [lon, lat];
+        init_map('map', position_Lausanne, zoom_level);
+    });
+</script>
+</body>
+</html>
+<!-- let's use CDN as much as we can-->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.18.2/ol.css">
+<style>
+    .ol-mouse-position {
+        top: inherit;
+        bottom: 8px;
+        right: 8px;
+        background-color: rgba(255, 255, 255, 0.75);
+        border-radius: 2px;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+    }
+</style>
