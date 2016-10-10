@@ -2,14 +2,9 @@
 /*jshint
  expr: true
  */
-var MAX_EXTENT_LIDAR = [532500, 149000, 545625, 161000]; // lidar 2012
+
 var map; //ol3 map
 var base_wmts_url = "https://map.lausanne.ch/tiles"; //valid on internet
-var swissProjection = new ol.proj.Projection({
-    code: 'EPSG:21781',
-    extent: MAX_EXTENT_LIDAR,
-    units: 'm'
-});
 
 var RESOLUTIONS = [50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05];
 /**
@@ -46,47 +41,61 @@ function wmtsLausanneSource(layer, options) {
     });
 }
 
-var vdl_wmts = [];
-vdl_wmts.push(new ol.layer.Tile({
-    title: 'Plan ville couleur',
-    type: 'base',
-    visible: true,
-    source: wmtsLausanneSource('fonds_geo_osm_bdcad_couleur', {
-        timestamps: [2015],
-        format: 'png'
-    })
-}));
-vdl_wmts.push(new ol.layer.Tile({
-    title: 'Plan cadastral (gris)',
-    type: 'base',
-    visible: false,
-    source: wmtsLausanneSource('fonds_geo_osm_bdcad_gris', {
-        timestamps: [2015],
-        format: 'png'
-    })
-}));
-vdl_wmts.push(new ol.layer.Tile({
-    title: 'Orthophoto 2012',
-    type: 'base',
-    visible: false,
-    source: wmtsLausanneSource('orthophotos_ortho_lidar_2012', {
-        timestamps: [2012],
-        format: 'png'
-    })
-}));
-vdl_wmts.push(new ol.layer.Tile({
-    title: 'Carte Nationale',
-    type: 'base',
-    visible: false,
-    source: wmtsLausanneSource('fonds_geo_carte_nationale_msgroup', {
-        timestamps: [2014],
-        format: 'png'
-    })
-}));
+
+function init_wmts_layers(){
+    "use strict";
+    var array_wmts = [];
+    array_wmts.push(new ol.layer.Tile({
+        title: 'Plan ville couleur',
+        type: 'base',
+        visible: true,
+        source: wmtsLausanneSource('fonds_geo_osm_bdcad_couleur', {
+            timestamps: [2015],
+            format: 'png'
+        })
+    }));
+    array_wmts.push(new ol.layer.Tile({
+        title: 'Plan cadastral (gris)',
+        type: 'base',
+        visible: false,
+        source: wmtsLausanneSource('fonds_geo_osm_bdcad_gris', {
+            timestamps: [2015],
+            format: 'png'
+        })
+    }));
+    array_wmts.push(new ol.layer.Tile({
+        title: 'Orthophoto 2012',
+        type: 'base',
+        visible: false,
+        source: wmtsLausanneSource('orthophotos_ortho_lidar_2012', {
+            timestamps: [2012],
+            format: 'png'
+        })
+    }));
+    array_wmts.push(new ol.layer.Tile({
+        title: 'Carte Nationale',
+        type: 'base',
+        visible: false,
+        source: wmtsLausanneSource('fonds_geo_carte_nationale_msgroup', {
+            timestamps: [2014],
+            format: 'png'
+        })
+    }));
+    return array_wmts;
+}
 
 
 function init_map(str_map_id, position, zoom_level) {
     "use strict";
+    var MAX_EXTENT_LIDAR = [532500, 149000, 545625, 161000]; // lidar 2012
+    var swissProjection = new ol.proj.Projection({
+        code: 'EPSG:21781',
+        extent: MAX_EXTENT_LIDAR,
+        units: 'm'
+    });
+    var vdl_wmts = [];
+    vdl_wmts = init_wmts_layers();
+
     var my_view = new ol.View({
         projection: swissProjection,
         center: position,

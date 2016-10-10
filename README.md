@@ -56,3 +56,8 @@ here is the result of custom compiling the above example ol3_02_wmtsmap.html
 [OpenLayers 3 LayerSwitcher plugin](https://github.com/walkermatt/ol3-layerswitcher)
 
 [compile our application and OpenLayers 3 together](http://openlayers.org/en/latest/doc/tutorials/closure.html)
+
+## Some Related useful links
+[GeoJSON format](http://geojson.org/geojson-spec.html)
+
+ 
