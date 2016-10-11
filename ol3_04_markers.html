@@ -53,6 +53,7 @@
         console.log('#EVENT document DOMContentLoaded : document.readyState=', document.readyState);
     });
     window.addEventListener('load', function () {
+
         function loadScript(url, callback)
         {
             // Adding the script tag to the head as suggested before
@@ -85,6 +86,27 @@
         var position_Lausanne = [lon, lat];
         init_map('map', position_Lausanne, zoom_level);
         loadScript('js/ol3-layerswitcher.js',layer_switcher_init_code);
+
+        var createIconStyle = function(imagePath) {
+            return new ol.style.Style({
+                image: new ol.style.Icon({
+                    src: imagePath
+                })
+            })
+        };
+
+        var coord_point_of_interest = [537632, 152619];
+        var batiment_flon = new ol.Feature(new ol.geom.Point(coord_point_of_interest));
+        batiment_flon.setStyle(createIconStyle('images/marker_blue_25x46.png'));
+        var vectorLayer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [batiment_flon]
+            })
+        });
+        map.addLayer(vectorLayer);  // doc --> http://openlayers.org/en/latest/apidoc/ol.Map.html#addLayer
+        var current_view = map.getView();
+        current_view.setCenter(coord_point_of_interest); // http://openlayers.org/en/latest/apidoc/ol.View.html#setCenter
+        current_view.setZoom(8);
 
     })
 </script>
