@@ -2,11 +2,13 @@
 
 Code samples to use Openlayers 3 to display a map that uses various WMTS Tiles from Lausanne as base Layer
 
-[ol3_01_osm_basemap.html is a very simple map using OL3 and OpenStreetMap layer](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_01_osm_basemap.html)
+[ol3_01_osm_basemap.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_01_osm_basemap.html) a very simple map using OL3 and OpenStreetMap layer
 
-[ol3_02_wmtsmap.html is a basic map using OL3 and one colorfoul WMTS layer](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_02_wmtsmap.html)
+[ol3_02_wmtsmap.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_02_wmtsmap.html) a basic map using OL3 and one colorfoul WMTS layer
 
-[ol3_03_wmts_layerswitcher.html is using a layer switcher to choose from one of various WMTS layer](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_03_wmts_layerswitcher.html)
+[ol3_03_wmts_layerswitcher.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_03_wmts_layerswitcher.html) base map using a layer switcher to choose from one of various WMTS layer
+
+[ol3_04_markers.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_04_markers.html) how to use a markers with the map 
 
 
 [Google PageSpeed Test Results](https://developers.google.com/speed/pagespeed/insights/?url=https%3A%2F%2Frawgit.com%2Flao-tseu-is-alive%2Fgomap%2Fmaster%2Fol3_02_wmtsmap.html&tab=desktop)
