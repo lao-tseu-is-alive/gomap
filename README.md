@@ -11,7 +11,7 @@ Code samples to use Openlayers 3 to display a map that uses various WMTS Tiles f
 [ol3_04_markers.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_04_markers.html) how to use a markers with the map 
 
 
-[Google PageSpeed Test Results](https://developers.google.com/speed/pagespeed/insights/?url=https%3A%2F%2Frawgit.com%2Flao-tseu-is-alive%2Fgomap%2Fmaster%2Fol3_02_wmtsmap.html&tab=desktop)
+[Speed Test Result for markers example](https://gtmetrix.com/reports/cgtest.trouvl.info/sW9mFSKh)
  
 
 # using async for better performance

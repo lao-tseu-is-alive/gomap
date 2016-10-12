@@ -41,8 +41,6 @@
 </div>
 
 <!-- let's use CDN as much as we can and postpone the css loading -->
-<!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
-<script src="http://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.18.2/ol.js" async></script>
 <script src="lib/proj4js/2.2.2/proj4.js" async></script>
 <script src="js/goeland_ol3_wmts.js" async></script>
@@ -112,7 +110,7 @@
 </body>
 </html>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.18.2/ol.css">
-<link rel="stylesheet" href="js/ol3-layerswitcher.css">
+<link rel="stylesheet" href="css/ol3-layerswitcher.css">
 <style>
     .ol-mouse-position {
         top: inherit;
