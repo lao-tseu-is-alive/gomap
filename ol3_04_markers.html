@@ -46,16 +46,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.18.2/ol.js" async></script>
 <script src="lib/proj4js/2.2.2/proj4.js" async></script>
 <script src="js/goeland_ol3_wmts.js" async></script>
-
-
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
         console.log('#EVENT document DOMContentLoaded : document.readyState=', document.readyState);
     });
     window.addEventListener('load', function () {
-
-        function loadScript(url, callback)
-        {
+        function loadScript(url, callback){
             // Adding the script tag to the head as suggested before
             var head = document.getElementsByTagName('head')[0];
             var script = document.createElement('script');
@@ -84,20 +80,23 @@
         var lat = 152095.7; //VARIABLE_Y
         var zoom_level = 4; //VARIABLE_ZOOM
         var position_Lausanne = [lon, lat];
-        init_map('map', position_Lausanne, zoom_level);
+        var map = init_map('map', position_Lausanne, zoom_level);
         loadScript('js/ol3-layerswitcher.js',layer_switcher_init_code);
 
-        var createIconStyle = function(imagePath) {
+
+        var createIconStyleCenterBottom = function(imagePath) {
             return new ol.style.Style({
-                image: new ol.style.Icon({
-                    src: imagePath
+                image: new ol.style.Icon({ // http://openlayers.org/en/latest/apidoc/ol.style.Icon.html
+                    src: imagePath,
+                    opacity: 0.60,
+                    anchor: [0.5, 1.0]   //we want the marker bottom to be centered
                 })
             })
         };
 
-        var coord_point_of_interest = [537632, 152619];
+        var coord_point_of_interest = [538224.21, 152378.17]; //PFA3 180 - St-Francois
         var batiment_flon = new ol.Feature(new ol.geom.Point(coord_point_of_interest));
-        batiment_flon.setStyle(createIconStyle('images/marker_blue_25x46.png'));
+        batiment_flon.setStyle(createIconStyleCenterBottom('images/marker_blue_32x58.png'));
         var vectorLayer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 features: [batiment_flon]
@@ -107,7 +106,6 @@
         var current_view = map.getView();
         current_view.setCenter(coord_point_of_interest); // http://openlayers.org/en/latest/apidoc/ol.View.html#setCenter
         current_view.setZoom(8);
-
     })
 </script>
 

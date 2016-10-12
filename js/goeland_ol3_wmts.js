@@ -3,98 +3,102 @@
  expr: true
  */
 
-var map; //ol3 map
-var base_wmts_url = "https://map.lausanne.ch/tiles"; //valid on internet
-
-var RESOLUTIONS = [50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05];
 /**
- * Allow to retrieve a valid OpenLayers WMTS source object
- * @param layer:string the name of the WMTS layer
- * @param options
- * @returns {ol.source.WMTS}
+ * allow to initialize base map rendreing inside a given div id
+ * @param {string} str_map_id  the div id to use ro render the map
+ * @param {array} position  [x,y] position of the center of the map
+ * @param {number} zoom_level
+ * @return {ol.Map} an OpenLayers Map object
  */
-function wmtsLausanneSource(layer, options) {
-    'use strict';
-    var resolutions = RESOLUTIONS;
-    if (Array.isArray(options.resolutions)) {
-        resolutions = options.resolutions;
-    }
-    var tileGrid = new ol.tilegrid.WMTS({
-        origin: [420000, 350000],
-        resolutions: resolutions,
-        matrixIds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    });
-    var extension = options.format || 'png';
-    var timestamp = options.timestamps;
-    var url = base_wmts_url + '/1.0.0/{Layer}/default/' + timestamp + '/swissgrid_05/{TileMatrix}/{TileRow}/{TileCol}.' + extension;
-    url = url.replace('http:', location.protocol);
-    //noinspection ES6ModulesDependencies
-    return new ol.source.WMTS(/** @type {olx.source.WMTSOptions} */{
-        //crossOrigin: 'anonymous',
-        attributions: [new ol.Attribution({
-            html: "&copy;<a href='http://www.lausanne.ch/cadastre>Cadastre'> www.lausanne.ch</a>"
-        })],
-        url: url,
-        tileGrid: tileGrid,
-        layer: layer,
-        requestEncoding: 'REST'
-    });
-}
-
-
-function init_wmts_layers(){
-    "use strict";
-    var array_wmts = [];
-    array_wmts.push(new ol.layer.Tile({
-        title: 'Plan ville couleur',
-        type: 'base',
-        visible: true,
-        source: wmtsLausanneSource('fonds_geo_osm_bdcad_couleur', {
-            timestamps: [2015],
-            format: 'png'
-        })
-    }));
-    array_wmts.push(new ol.layer.Tile({
-        title: 'Plan cadastral (gris)',
-        type: 'base',
-        visible: false,
-        source: wmtsLausanneSource('fonds_geo_osm_bdcad_gris', {
-            timestamps: [2015],
-            format: 'png'
-        })
-    }));
-    array_wmts.push(new ol.layer.Tile({
-        title: 'Orthophoto 2012',
-        type: 'base',
-        visible: false,
-        source: wmtsLausanneSource('orthophotos_ortho_lidar_2012', {
-            timestamps: [2012],
-            format: 'png'
-        })
-    }));
-    array_wmts.push(new ol.layer.Tile({
-        title: 'Carte Nationale',
-        type: 'base',
-        visible: false,
-        source: wmtsLausanneSource('fonds_geo_carte_nationale_msgroup', {
-            timestamps: [2014],
-            format: 'png'
-        })
-    }));
-    return array_wmts;
-}
-
-
 function init_map(str_map_id, position, zoom_level) {
-    "use strict";
+    'use strict';
+    var base_wmts_url = 'https://map.lausanne.ch/tiles'; //valid on internet
+    var RESOLUTIONS = [50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05];
+
+    /**
+     * Allow to retrieve a valid OpenLayers WMTS source object
+     * @param {string} layer  the name of the WMTS layer
+     * @param {object} options
+     * @return {ol.source.WMTS} a valid OpenLayers WMTS source
+     */
+    function wmtsLausanneSource(layer, options) {
+        var resolutions = RESOLUTIONS;
+        if (Array.isArray(options.resolutions)) {
+            resolutions = options.resolutions;
+        }
+        var tileGrid = new ol.tilegrid.WMTS({
+            origin: [420000, 350000],
+            resolutions: resolutions,
+            matrixIds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        });
+        var extension = options.format || 'png';
+        var timestamp = options.timestamps;
+        var url = base_wmts_url + '/1.0.0/{Layer}/default/' + timestamp +
+            '/swissgrid_05/{TileMatrix}/{TileRow}/{TileCol}.' + extension;
+        url = url.replace('http:', location.protocol);
+        //noinspection ES6ModulesDependencies
+        return new ol.source.WMTS(/** @type {olx.source.WMTSOptions} */{
+            //crossOrigin: 'anonymous',
+            attributions: [new ol.Attribution({
+                html: '&copy;<a ' +
+                "href='http://www.lausanne.ch/cadastre>Cadastre'>" +
+                'SCC Lausanne</a>'
+            })],
+            url: url,
+            tileGrid: tileGrid,
+            layer: layer,
+            requestEncoding: 'REST'
+        });
+    }
+
+
+    function init_wmts_layers() {
+        var array_wmts = [];
+        array_wmts.push(new ol.layer.Tile({
+            title: 'Plan ville couleur',
+            type: 'base',
+            visible: true,
+            source: wmtsLausanneSource('fonds_geo_osm_bdcad_couleur', {
+                timestamps: [2015],
+                format: 'png'
+            })
+        }));
+        array_wmts.push(new ol.layer.Tile({
+            title: 'Plan cadastral (gris)',
+            type: 'base',
+            visible: false,
+            source: wmtsLausanneSource('fonds_geo_osm_bdcad_gris', {
+                timestamps: [2015],
+                format: 'png'
+            })
+        }));
+        array_wmts.push(new ol.layer.Tile({
+            title: 'Orthophoto 2012',
+            type: 'base',
+            visible: false,
+            source: wmtsLausanneSource('orthophotos_ortho_lidar_2012', {
+                timestamps: [2012],
+                format: 'png'
+            })
+        }));
+        array_wmts.push(new ol.layer.Tile({
+            title: 'Carte Nationale',
+            type: 'base',
+            visible: false,
+            source: wmtsLausanneSource('fonds_geo_carte_nationale_msgroup', {
+                timestamps: [2014],
+                format: 'png'
+            })
+        }));
+        return array_wmts;
+    }
     var MAX_EXTENT_LIDAR = [532500, 149000, 545625, 161000]; // lidar 2012
     var swissProjection = new ol.proj.Projection({
         code: 'EPSG:21781',
         extent: MAX_EXTENT_LIDAR,
         units: 'm'
     });
-    var vdl_wmts = [];
-    vdl_wmts = init_wmts_layers();
+    var vdl_wmts = init_wmts_layers();
 
     var my_view = new ol.View({
         projection: swissProjection,
@@ -108,7 +112,7 @@ function init_map(str_map_id, position, zoom_level) {
         coordinateFormat: ol.coordinate.createStringXY(2),
         projection: 'EPSG:21781'
     });
-    map = new ol.Map({
+    return new ol.Map({
         target: str_map_id,
         controls: [
             new ol.control.Zoom(),
