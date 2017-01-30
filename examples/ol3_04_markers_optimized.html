@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <meta charset=UTF-8>
+    <meta http-equiv=X-UA-Compatible content="chrome=1">
+    <meta name=viewport content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>ol3_03 wmts multiple layers with layerswitcher</title>
+    <style>html, body {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        font-family: sans-serif;
+        font-size: small;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }</style>
+</head>
+<body>
+<div id=loader_message><p>Loading the map...<br>
+    <p>Chargement de la carte ...<br><br>
+    <p>Please be patient</div>
+<div id=map>
+    <noscript>You need javascript to use this page</noscript>
+</div>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.20.1/ol.js" async></script>
+<script async src="../js/proj4js/2.2.2/proj4.js" async></script>
+<script async src="../js/goeland_ol3_wmts-min.js" async></script>
+<script>var map, marker_layer;
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('#EVENT document DOMContentLoaded : document.readyState=', document.readyState);
+});
+window.addEventListener('load', function () {
+    function loadScript(url, callback) {
+        var head = document.getElementsByTagName('head')[0];
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = url;
+        script.onreadystatechange = callback;
+        script.onload = callback;
+        head.appendChild(script);
+    }
+
+    var layer_switcher_init_code = function () {
+        var layerSwitcher = new ol.control.LayerSwitcher({tipLabel: 'Légende'});
+        map.addControl(layerSwitcher);
+    };
+    console.log('#EVENT window load: document.readyState=', document.readyState);
+    document.getElementById('loader_message').style.display = 'none';
+    proj4.defs("EPSG:21781", "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=674.4,15.1,405.3,0,0,0,0 +units=m +no_defs");
+    var lon = 537892.8;
+    var lat = 152095.7;
+    var zoom_level = 4;
+    var position_Lausanne = [lon, lat];
+    map = init_map('map', position_Lausanne, zoom_level);
+    loadScript('../js/ol3-layerswitcher-min.js', layer_switcher_init_code);
+    var createIconStyleCenterBottom = function (imagePath) {
+        return new ol.style.Style({image: new ol.style.Icon({src: imagePath, opacity: 0.60, anchor: [0.5, 1.0]})})
+    };
+    var coord_pfa3_180_stfrancois = [538224.21, 152378.17];
+    var eglise_stfrancois = new ol.Feature(new ol.geom.Point(coord_pfa3_180_stfrancois));
+    eglise_stfrancois.setStyle(createIconStyleCenterBottom('images/marker_blue_32x58.png'));
+    var coord_poste_stfrancois = [538189, 152308];
+    var poste_stfrancois = new ol.Feature(new ol.geom.Point(coord_poste_stfrancois));
+    poste_stfrancois.setStyle(createIconStyleCenterBottom('images/marker_red_32x58.png'));
+    marker_layer = new ol.layer.Vector({source: new ol.source.Vector({features: [eglise_stfrancois, poste_stfrancois]})});
+    map.addLayer(marker_layer);
+    var current_view = map.getView();
+    current_view.setCenter(coord_pfa3_180_stfrancois);
+    current_view.setZoom(8);
+    var extent = marker_layer.getSource().getExtent();
+    current_view.fit(extent, map.getSize());
+})</script>
+</body>
+</html>
+<link rel=stylesheet href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.20.1/ol.css">
+<link rel=stylesheet href="../css/ol3-layerswitcher-min.css">
+<style>.ol-mouse-position {
+    top: inherit;
+    bottom: 8px;
+    right: 8px;
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 2px;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}</style>
