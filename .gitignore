@@ -43,7 +43,7 @@ jspm_packages
 /lib/OpenLayers3xCookbook_code/
 /lib/v3.18.2/
 /doc/
-/ol3_02_geoadmin_wmts.html
+/examples/ol3_02_geoadmin_wmts.html
 /lib/ol3*
 /bundle.js
 /bundle_browserify.js

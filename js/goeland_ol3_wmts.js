@@ -82,6 +82,15 @@ function init_map(str_map_id, position, zoom_level) {
             })
         }));
         array_wmts.push(new ol.layer.Tile({
+            title: 'Orthophoto 2016',
+            type: 'base',
+            visible: false,
+            source: wmtsLausanneSource('orthophotos_ortho_lidar_2016', {
+                timestamps: [2016],
+                format: 'png'
+            })
+        }));
+        array_wmts.push(new ol.layer.Tile({
             title: 'Carte Nationale',
             type: 'base',
             visible: false,
@@ -107,6 +116,7 @@ function init_map(str_map_id, position, zoom_level) {
         minZoom: 1,
         maxZoom: 10,
         extent: MAX_EXTENT_LIDAR
+        //,        resolutions: RESOLUTIONS
     });
     var mouse_position_control = new ol.control.MousePosition({
         coordinateFormat: ol.coordinate.createStringXY(2),

@@ -2,13 +2,13 @@
 
 Code samples to use Openlayers 3 to display a map that uses various WMTS Tiles from Lausanne as base Layer
 
-[ol3_01_osm_basemap.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_01_osm_basemap.html) a very simple map using OL3 and OpenStreetMap layer
+[ol3_01_osm_basemap.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/examples/ol3_01_osm_basemap.html) a very simple map using OL3 and OpenStreetMap layer
 
-[ol3_02_wmtsmap.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_02_wmtsmap.html) a basic map using OL3 and one colorfoul WMTS layer
+[ol3_02_wmtsmap.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/examples/ol3_02_wmtsmap.html) a basic map using OL3 and one colorfoul WMTS layer
 
-[ol3_03_wmts_layerswitcher.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_03_wmts_layerswitcher.html) base map using a layer switcher to choose from one of various WMTS layer
+[ol3_03_wmts_layerswitcher.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/examples/ol3_03_wmts_layerswitcher.html) base map using a layer switcher to choose from one of various WMTS layer
 
-[ol3_04_markers.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/ol3_04_markers.html) how to use a markers with the map 
+[ol3_04_markers.html](https://rawgit.com/lao-tseu-is-alive/gomap/master/examples/ol3_04_markers.html) how to use a markers with the map 
 
 
 [Speed Test Result for markers example](https://gtmetrix.com/reports/cgtest.trouvl.info/sW9mFSKh)
@@ -37,14 +37,15 @@ Believe me the async with a library on CDN is a much easy path !
 
 
 
-You can also try to use [browserify](http://browserify.org/) or other identical tools to pack all your javascript code in a bundle
-basic usage is explained in [this page](http://openlayers.org/en/latest/doc/tutorials/browserify.html) : 
+You can also try to use [browserify](http://browserify.org/) or other identical tools like [webpack](https://webpack.github.io/) to build & pack all your javascript code in a single bundle.
+
+Basic usage with OpenLayers is explained in [this page](http://openlayers.org/en/latest/doc/tutorials/browserify.html) : 
 
 ./node_modules/.bin/browserify first.js second.js -o bundle.js
 
 
 
-here is the result of custom compiling the above example ol3_02_wmtsmap.html
+here is the performance result of custom compiling the above example ol3_02_wmtsmap.html
 [Google PageSpeed after compiling](https://developers.google.com/speed/pagespeed/insights/?url=http%3A%2F%2Fcgtest.trouvl.info%2Fapp.html&tab=mobile)
 
 
