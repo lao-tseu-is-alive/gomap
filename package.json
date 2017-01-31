@@ -4,6 +4,9 @@
   "description": "goeland map with openlayers 3 custom build",
   "main": "index.js",
   "scripts": {
+    "build_webpack_dist": "rimraf dist && NODE_ENV=production webpack",
+    "clean_dist": "rimraf dist",
+    "dev_webpack_server": "NODE_ENV=development node dev-server.js",
     "start": "concurrently \"npm run tsc:w\" \"npm run lite\" ",
     "lite": "lite-server",
     "postinstall": "typings install",
@@ -33,18 +36,27 @@
     "openlayers": "^3.20.1"
   },
   "devDependencies": {
-    "browserify": "^13.0.0",
-    "concurrently": "^2.2.0",
+    "babel-core": "^6.22.1",
+    "babel-loader": "^6.2.10",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "browserify": "^14.0.0",
+    "concurrently": "^3.1.0",
+    "css-loader": "^0.26.1",
     "eslint": "^3.5.0",
-    "google-closure-library": "^20160911.0.0",
+    "file-loader": "^0.10.0",
+    "google-closure-library": "^20170124.0.0",
     "gulp": "^3.9.1",
     "lite-server": "^2.2.2",
+    "rimraf": "^2.5.4",
     "typescript": "^2.0.2",
     "typings": "^1.3.2",
-    "webpack": "^1.12.13"
+    "url-loader": "^0.5.7",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.2.0"
   },
   "jshintConfig": {
     "maxerr": 50,
-    "esversion": 5
+    "esversion": 6
   }
 }
