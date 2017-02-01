@@ -47,3 +47,4 @@ jspm_packages
 /lib/ol3*
 /bundle.js
 /bundle_browserify.js
+/dist/
