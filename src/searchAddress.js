@@ -2,11 +2,11 @@ import * as U from './htmlUtils';
 const searchAddress = {
     searchAddress: `
         <div class="three columns"><input type="search" id="searchAdd"></div>
-        <div class="three columns"><button id="myButton" class="button-primary">Rechercher</button></div>
+        <div class="three columns"><button id="searchButton" class="button-primary">Rechercher</button></div>
         
 `,
     attachEl: () => {
-        U.getEl('myButton').addEventListener('click', () => {
+        U.getEl('searchButton').addEventListener('click', () => {
             // next one allow to stop in debuger in chrome
             //debugger;
             const search = U.getEl('searchAdd');

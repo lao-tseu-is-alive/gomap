@@ -1,32 +1,49 @@
 /**
  * Created by cgil on 2/1/17.
  */
+
+//TODO: add method to clear and assign values to form
+
+
 const Form = `
-<p>
-<div class="row">
-<form>
-        <div class="six columns">
-              <label for="EmailInput">Votre email</label>
-              <input class="u-full-width" type="email" placeholder="test@mailbox.com" id="EmailInput">
-        </div>
-        <div class="six columns">
-              <label for="exampleRecipientInput">Raison du contact</label>
-              <select class="u-full-width" id="exampleRecipientInput">
-                <option value="Option 1">Questions</option>
-                <option value="Option 2">Signaler un Bug</option>
-                <option value="Option 3">Demande de collaboration</option>
-              </select>
-        </div>
-        <label for="exampleMessage">Message</label>
-        <textarea class="u-full-width" placeholder="Hi Dave …" id="exampleMessage"></textarea>
-        <label class="example-send-yourself-copy">
-            <input type="checkbox">
-            <span class="label-body">Send a copy to yourself</span>
+
+<form class="form-horizontal">
+  <div class="form-group">
+    <label for="obj_name" class="col-sm-2 control-label">Nom :</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="obj_name" placeholder="Nom de cet objet">
+    </div>
+  </div>  
+  <div class="form-group">
+    <label for="obj_url" class="col-sm-2 control-label">Url :</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="obj_url" placeholder="Url de cet objet">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="obj_coordxy" class="col-sm-2 control-label">Coordonnées X,Y :</label>
+    <div class="col-sm-10">
+      <input type="text" readonly class="form-control" id="obj_coordxy" placeholder="Position X,Y de cet objet">
+    </div>
+  </div>
+  <!--
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <div class="checkbox">
+        <label>
+          <input type="checkbox"> Remember me
         </label>
-        <input class="button-primary" type="submit" value="Submit">
+      </div>
+    </div>
+  </div>
+  -->
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-default">SAUVER</button>
+      <button type="submit" class="btn btn-default">EFFACER</button>
+    </div>
+  </div>
 </form>
-</div>
-</p>
 `; //end of Form content template
 
 export default Form;

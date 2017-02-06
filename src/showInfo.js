@@ -8,13 +8,13 @@ const debugInfo = DEV ? `<span class="${css.boxDebug}"> ${envInfo} </span>` : ``
 console.log(envInfo);
 
 const Info = `
-<p>
-<div class="row">
-<div class="row">
-    <div class="six columns"><h4>${messages.app_title}</h4></div>
-    <div class="six columns">${messages.app_info} <br>${debugInfo}</div>
-  </div>
-</div>
-</p>
+    <h4>${messages.app_title}</h4>
+    <div >
+        <ul>
+        <li><a href="https://gtmetrix.com/reports/gomap.gil.town/KpBlmPoR">GTMetrix A score (100%)</a></li>
+        <li><a href="https://developers.google.com/speed/pagespeed/insights/?url=https%3A%2F%2Fgomap.gil.town%2F">91/100 on Google PageSpeed</a></li>
+        </ul>
+    </div>
+    <div >${messages.app_info} <br>${debugInfo}</div>
 `;
 export default Info;

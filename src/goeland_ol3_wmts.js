@@ -1,9 +1,11 @@
 import ol from 'openlayers';
+import * as U from './htmlUtils';
+import proj4 from './proj4';
 /*global ol*/
 /*jshint
  expr: true
  */
-
+proj4.defs("EPSG:21781", "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=674.4,15.1,405.3,0,0,0,0 +units=m +no_defs");
 /**
  * allow to initialize base map rendreing inside a given div id
  * @param {string} str_map_id  the div id to use ro render the map
@@ -120,7 +122,7 @@ const init_map = function (str_map_id, position, zoom_level) {
         //,        resolutions: RESOLUTIONS
     });
     var mouse_position_control = new ol.control.MousePosition({
-        coordinateFormat: ol.coordinate.createStringXY(2),
+        coordinateFormat: ol.coordinate.createStringXY(0),
         projection: 'EPSG:21781'
     });
     return new ol.Map({
@@ -130,11 +132,11 @@ const init_map = function (str_map_id, position, zoom_level) {
             mouse_position_control,
             new ol.control.Rotate(),
             new ol.control.ZoomSlider(),
-            new ol.control.ScaleLine()
+            //new ol.control.ScaleLine()
         ],
         layers: vdl_wmts,
         view: my_view
     });
 }
 
-export default init_map
+export default init_map;
