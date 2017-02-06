@@ -1,6 +1,15 @@
 # gomap
 
-Code samples to use Openlayers 3 to display a map that uses various WMTS Tiles from Lausanne as base Layer
+The main idea is to make a template project to display  WMTS OpenLayers 3 Map of Lausanne,
+the actual version is in src directory for the javascript part, I use the Webpack ver 2 bundler and do ES6 transpiling with Babel
+
+You can use "npm install" as usual to get all you need in your local dev,
+then you can "npm run dev_webpack_server" to develop 
+ 
+when you're ready to deploy you can then do a simple "npm run build_webpack_dist" to get a complete bundle inside the "dist" directory 
+ 
+
+in examples directory there is some code samples to use Openlayers 3 to display a map that uses various WMTS Tiles from Lausanne as base Layer
 
 [ol3_01_osm_basemap.html](http://htmlpreview.github.io/?https://github.com/lao-tseu-is-alive/gomap/blob/master/examples/ol3_01_osm_basemap.html) a very simple map using OL3 and OpenStreetMap layer
 
