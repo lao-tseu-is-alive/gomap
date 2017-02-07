@@ -4,16 +4,21 @@
 
 //TODO: add method to clear and assign values to form
 
-
 const Form = `
 
 <form class="form-horizontal">
   <div class="form-group">
-    <label for="obj_name" class="col-sm-2 control-label">Nom :</label>
+    <label for="obj_name" class="col-sm-2 control-label">Nom:</label>
     <div class="col-sm-10">
       <input type="text" class="form-control" id="obj_name" placeholder="Nom de cet objet">
     </div>
-  </div>  
+  </div>
+  <div class="form-group">
+    <label for="obj_date_begin" class="col-sm-2 control-label">Date de fin:</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="obj_date_begin" placeholder="Date de début">
+    </div>
+  </div>
   <div class="form-group">
     <label for="obj_url" class="col-sm-2 control-label">Url :</label>
     <div class="col-sm-10">
@@ -26,6 +31,13 @@ const Form = `
       <input type="text" readonly class="form-control" id="obj_coordxy" placeholder="Position X,Y de cet objet">
     </div>
   </div>
+  <div class="form-group">
+    <label for="obj_description" class="col-sm-2 control-label">Description :</label>
+    <div class="col-sm-10">
+        <textarea id="obj_description" class="form-control" rows="3"></textarea>
+    </div>
+  </div>
+
   <!--
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">

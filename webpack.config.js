@@ -28,7 +28,14 @@ const plugins = PRODUCTION ? [
         new ExtractTextPlugin('style-[contenthash:10].css'),
         new HTMLWebpackPlugin({ template: 'index_webpack_template.html'})
     ] : [
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+
+        new webpack.ProvidePlugin({
+            'jQuery': 'jquery',
+            '$': 'jquery',
+            'global.jQuery': 'jquery'
+        })
+
     ];
 
 plugins.push(
@@ -54,7 +61,7 @@ module.exports = {
     entry: entry,
     plugins: plugins,
     externals: {
-        jquery: 'jQuery', //jquery is external and available at the global variable jQuery
+        //jquery: 'jQuery', //jquery can be an external (script tag in html available at the global variable jQuery
         //ol: 'ol'
     },
     module: {
@@ -83,4 +90,11 @@ module.exports = {
         publicPath: PRODUCTION ? '' : '/dist/',
         filename: PRODUCTION ? 'bundle.[hash:12].min.js' : 'bundle.js'
     }
+    /*,
+    resolve: {
+        alias: {
+            'jquery-ui': 'jquery-ui-dist/jquery-ui.js'
+        }
+    },
+    */
 };

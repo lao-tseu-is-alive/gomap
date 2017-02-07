@@ -35,8 +35,7 @@
   "dependencies": {
     "jquery": "^3.1.1",
     "ol3-layerswitcher": "^1.1.2",
-    "openlayers": "^3.20.1",
-    "skeleton-plus": "^2.0.1"
+    "openlayers": "^3.20.1"
   },
   "devDependencies": {
     "babel-core": "^6.22.1",

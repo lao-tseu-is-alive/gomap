@@ -48,3 +48,5 @@ jspm_packages
 /bundle.js
 /bundle_browserify.js
 /dist/
+/examples/lib/*
+

@@ -72,4 +72,5 @@ here is the performance result of custom compiling the above example ol3_02_wmts
 ## Some Related useful links
 [GeoJSON format](http://geojson.org/geojson-spec.html)
 
+[Great video introduction of webpack v2 ](https://www.youtube.com/watch?v=eWmkBNBTbMM)
  
