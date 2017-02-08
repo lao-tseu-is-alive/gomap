@@ -32,6 +32,7 @@ function getMapClickCoordsXY(x,y) {
             console.log(formatGeoJSON.writeFeature(feature));
             console.log(formatWKT.writeFeature(feature));
         }
+        // put the attribute data of this feature somewhere
         const CoordXY = U.getEl('obj_coordxy');
         CoordXY.value = formatWKT.writeFeature(feature);
         const obj_name = U.getEl('obj_name');
@@ -88,22 +89,27 @@ function displayForm(){
             elContent.innerHTML = pageModule.default;
         });
 }
+
+function displayInfo(){
+    "use strict";
+    System.import('./showInfo')
+        .then(pageModule => {
+            elContent.innerHTML = pageModule.default;
+        });
+}
 U.getEl('showForm').addEventListener('click', () => {
     displayForm();
 });
 
 U.getEl('showInfo').addEventListener('click', () => {
-    System.import('./showInfo')
-        .then(pageModule => {
-            elContent.innerHTML = pageModule.default;
-        });
+    displayInfo();
 });
 
 //////////////////////////////////////////////////////////////////////
 
 
 // on decide d'afficher le formulaire par defaut ? ou pas
-displayForm();
+displayInfo();
 //
 
 // if you really need jquery just do a

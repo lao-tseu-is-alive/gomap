@@ -16,5 +16,18 @@ const Info = `
         </ul>
     </div>
     <div >${messages.app_info} <br>${debugInfo}</div>
+    <!-- GEOLOCATION FEEDBACK -->
+    <div id="info" style="display: none;"></div>
+    <label for="track">
+      track position
+      <input id="track" type="checkbox" checked/>
+    </label>
+    <p>
+      position accuracy : <code id="accuracy"></code>&nbsp;&nbsp;
+      altitude : <code id="altitude"></code>&nbsp;&nbsp;
+      altitude accuracy : <code id="altitudeAccuracy"></code>&nbsp;&nbsp;
+      heading : <code id="heading"></code>&nbsp;&nbsp;
+      speed : <code id="speed"></code>
+    </p>
 `;
 export default Info;
