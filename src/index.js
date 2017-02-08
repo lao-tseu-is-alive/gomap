@@ -10,6 +10,8 @@ import ol from 'openlayers';
 import gomap from './goeland_ol3_wmts';
 import * as U from './htmlUtils';
 import searchAddress from './searchAddress';
+import Form from './showForm';
+import Info from './showInfo';
 
 
 function getMapClickCoordsXY(x,y) {
@@ -84,18 +86,24 @@ searchAddress.attachEl();
 const elContent = U.getEl('content');
 function displayForm(){
     "use strict";
+    /* commented by cgil 8-2-2016 because System.import generates promise and IE crash
     System.import('./showForm')
         .then(pageModule => {
             elContent.innerHTML = pageModule.default;
         });
+    */
+    elContent.innerHTML = Form;
 }
 
 function displayInfo(){
     "use strict";
+    /* commented by cgil 8-2-2016 because System.import generates promise and IE crash
     System.import('./showInfo')
         .then(pageModule => {
             elContent.innerHTML = pageModule.default;
         });
+   */
+    elContent.innerHTML = Info;
 }
 U.getEl('showForm').addEventListener('click', () => {
     displayForm();
