@@ -30,7 +30,7 @@ const gomap = {
          * @param {boolean} enableGeoLocation
          * @return {ol.Map} an OpenLayers Map object
          */
-        init_map: function (str_map_id, position, zoom_level, clickCallback, enableGeoLocation) {
+        init_map: function (str_map_id, position, zoom_level, clickCallback, enableGeoLocation, geolocationChangeCallback) {
             'use strict';
             if (typeof(enableGeoLocation) === "undefined") enableGeoLocation = true;
             var base_wmts_url = 'https://map.lausanne.ch/tiles'; //valid on internet
@@ -187,13 +187,10 @@ const gomap = {
             });
             geolocation.setTracking(enableGeoLocation);
 
+
             // update the HTML page when the position changes.
             geolocation.on('change', function () {
-                U.getEl('accuracy').innerText = geolocation.getAccuracy() + ' [m]';
-                U.getEl('altitude').innerText = geolocation.getAltitude() + ' [m]';
-                U.getEl('altitudeAccuracy').innerText = geolocation.getAltitudeAccuracy() + ' [m]';
-                U.getEl('heading').innerText = geolocation.getHeading() + ' [rad]';
-                U.getEl('speed').innerText = geolocation.getSpeed() + ' [m/s]';
+                geolocationChangeCallback(geolocation);
             });
 
             geolocation.on('error', function (error) {
@@ -247,9 +244,17 @@ const gomap = {
                     console.log("geolocation in 21781 : " + P21781.x + "," + P21781.y);
                     //debugger;
                 }
-                positionFeature.setGeometry(new ol.geom.Point([P21781.x, P21781.y]));
-                accuracyFeature.setGeometry(new ol.geom.Point([P21781.x, P21781.y]));
+                const currentPosition = [P21781.x, P21781.y];
+                const  currentPointPosition = new ol.geom.Point(currentPosition);
+                positionFeature.setGeometry(currentPointPosition);
+                accuracyFeature.setGeometry(currentPointPosition);
+                my_view.setCenter(currentPosition);
+                my_view.setZoom(8);
+
                 /*
+
+
+
                  positionFeature.setGeometry(coordinates ?
                  new ol.geom.Point(P21781.x , P21781.y) : null);
                  */
