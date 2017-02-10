@@ -144,7 +144,7 @@ const gomap = {
                 coordinateFormat: ol.coordinate.createStringXY(0),
                 projection: 'EPSG:21781'
             });
-            U.getEl('map').innerHtml = '';
+            U.getEl('mapdiv').innerHtml = '';
             const map = new ol.Map({
                 target: str_map_id,
                 controls: [
@@ -188,13 +188,13 @@ const gomap = {
             geolocation.setTracking(enableGeoLocation);
 
 
-            // update the HTML page when the position changes.
+            // update the HTML page when the geolocation information changes.
             geolocation.on('change', function () {
                 geolocationChangeCallback(geolocation);
             });
 
             geolocation.on('error', function (error) {
-                var info = document.getElementById('info');
+                var info = U.getEl('info');
                 info.innerHTML = error.message;
                 info.style.display = '';
             });
