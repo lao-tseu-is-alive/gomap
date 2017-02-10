@@ -14,6 +14,62 @@ import Form from './showForm';
 import Info from './showInfo';
 
 
+function loadForm(){
+    "use strict";
+    /* commented by cgil 8-2-2016 because System.import generates promise and IE crash
+     System.import('./showForm')
+     .then(pageModule => {
+     elContent.innerHTML = pageModule.default;
+     });
+     */
+    U.getEl('contentForm').innerHTML = Form;
+}
+
+function loadInfo(){
+    "use strict";
+    /* commented by cgil 8-2-2016 because System.import generates promise and IE crash
+     System.import('./showInfo')
+     .then(pageModule => {
+     elContent.innerHTML = pageModule.default;
+     });
+     */
+    U.getEl('contentInfo').innerHTML = Info;
+}
+
+function hidePanels() {
+    $('#contentInfo').slideUp();
+    $('#contentForm').slideUp();
+}
+
+function activateForm() {
+    // $('#contentInfo').closest('.panel').slideUp();
+    // $('#contentForm').closest('.panel').slideDown();
+    $('#contentInfo').slideUp();
+    $('#contentForm').slideDown();
+    //U.getEl('contentInfo').style.display = 'none';
+    //U.getEl('contentForm').style.display = '';
+
+
+}
+
+function activateInfo() {
+    $('#contentForm').slideUp();
+    $('#contentInfo').slideDown();
+    //U.getEl('contentForm').style.display = 'none';
+    //U.getEl('contentInfo').style.display = '';
+
+}
+
+
+function updateGeolocationInfo(geolocation) {
+    U.getEl('accuracy').innerText = geolocation.getAccuracy() + ' [m]';
+    U.getEl('altitude').innerText = geolocation.getAltitude() + ' [m]';
+    U.getEl('altitudeAccuracy').innerText = geolocation.getAltitudeAccuracy() + ' [m]';
+    U.getEl('heading').innerText = geolocation.getHeading() + ' [rad]';
+    U.getEl('speed').innerText = geolocation.getSpeed() + ' [m/s]';
+}
+
+
 function getMapClickCoordsXY(x,y) {
     //TODO add togle buton to check if we are in 'insert mode'
     var feature = map.forEachFeatureAtPixel(map.getPixelFromCoordinate([x,y]), function(feature, layer) {
@@ -49,12 +105,14 @@ function getMapClickCoordsXY(x,y) {
 
 }
 
+
 var lon = 537892.8;
 var lat = 152095.7;
 var zoom_level = 4;
 var position_Lausanne = [lon, lat];
-
-var map = gomap.init_map('map', position_Lausanne, zoom_level, getMapClickCoordsXY);
+loadForm();
+loadInfo();
+var map = gomap.init_map('mapdiv', position_Lausanne, zoom_level, getMapClickCoordsXY, U.getEl('track').checked, updateGeolocationInfo);
 
 
 /*
@@ -77,48 +135,31 @@ var cinema_layer = gomap.loadGeoJSONLayer(geojson_url,marker_cinema);
 
 searchAddress.attachEl();
 
+U.getEl('loader_message').style.display = 'none';
 //////////////////////////////////////////////////////////////////////
 //// EVENT HANDLERS
 
-// next 2 listeners are here to show how to handle dynamic page content loading,
-// it's kind of "poor's man" htlm templates :-(
-// but it works and loads page async
-const elContent = U.getEl('content');
-function displayForm(){
-    "use strict";
-    /* commented by cgil 8-2-2016 because System.import generates promise and IE crash
-    System.import('./showForm')
-        .then(pageModule => {
-            elContent.innerHTML = pageModule.default;
-        });
-    */
-    elContent.innerHTML = Form;
-}
-
-function displayInfo(){
-    "use strict";
-    /* commented by cgil 8-2-2016 because System.import generates promise and IE crash
-    System.import('./showInfo')
-        .then(pageModule => {
-            elContent.innerHTML = pageModule.default;
-        });
-   */
-    elContent.innerHTML = Info;
-}
-U.getEl('showForm').addEventListener('click', () => {
-    displayForm();
+U.getEl('track').addEventListener('change', function() {
+    gomap.getGeolocationRef().setTracking(this.checked);
 });
 
-U.getEl('showInfo').addEventListener('click', () => {
-    displayInfo();
-});
+
+U.getEl('showForm').addEventListener('click', () => {activateForm();});
+
+U.getEl('showInfo').addEventListener('click', () => {activateInfo();});
+
+$('.clickable').on('click',function(){
+    hidePanels();
+    //var effect = $(this).data('effect');
+    //$(this).closest('.panel')[effect]();
+})
 
 //////////////////////////////////////////////////////////////////////
 
 
-// on decide d'afficher le formulaire par defaut ? ou pas
-displayInfo();
+
 //
+
 
 // if you really need jquery just do a
 // import $ from 'jquery';
