@@ -5,18 +5,30 @@
 //TODO: add method to clear and assign values to form
 
 const Form = `
-
+<div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">Information sur cet objet</h3>
+            <span class="pull-right clickable glyphicon glyphicon-remove" data-effect="slideUp"><i class="fa fa-times"></i></span>
+      </div>
+      <div class="panel-body">      
+      
 <form class="form-horizontal">
   <div class="form-group">
     <label for="obj_name" class="col-sm-2 control-label">Nom:</label>
     <div class="col-sm-10">
-      <input type="text" class="form-control" id="obj_name" placeholder="Nom de cet objet">
+      <input type="text" class="form-control" id="obj_name" placeholder="Nom de ce chantier">
     </div>
   </div>
   <div class="form-group">
-    <label for="obj_date_begin" class="col-sm-2 control-label">Date de fin:</label>
+    <label for="obj_date_begin" class="col-sm-2 control-label">Date de début:</label>
     <div class="col-sm-10">
       <input type="text" class="form-control" id="obj_date_begin" placeholder="Date de début">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="obj_date_end" class="col-sm-2 control-label">Date de fin:</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="obj_date_end" placeholder="Date de fin">
     </div>
   </div>
   <div class="form-group">
@@ -56,6 +68,8 @@ const Form = `
     </div>
   </div>
 </form>
+</div> <!--end of panel body -->
+</div>
 `; //end of Form content template
 
 export default Form;

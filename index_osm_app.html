@@ -4,26 +4,34 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <title>OpenLayers 3 WebApp</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
           integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
 
 </head>
 <body>
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Lausanne GoMap</a>
+            <a class="navbar-brand" href="#">Map</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <div class="navbar-form navbar-right">
@@ -43,40 +51,22 @@
         </div><!--/.navbar-collapse -->
     </div>
 </nav>
-<!-- Main jumbotron for a primary marketing message or call to action -->
-<div class="jumbotron">
-    <div class="container-fluid">
-        <p>
 
-        </p>
-    </div>
-</div>
-<div class="container-fluid">
-    <!-- Example row of columns -->
-    <div class="row">
-        <div id="map" class="col-md-6"></div>
-        <div id="content" class="col-md-6">
-            <h3>Informations</h3>
-            <p>using webpack 2 bundler and ES6 transpiling with Babel to make a WMTS OpenLayers 3 Map of Lausanne
-                with editable objects
-            </p>
-            <div id=loader_message><p>Loading the application...<br>
-                <p>Chargement de l'application...</p><br><br>
-                <p>Please be patient</p>
-            </div>
-        </div>
-    </div>
+<div id="contentForm" class="gopopup goform" style="display: none;"></div>
+<div id="contentInfo" class="gopopup goinfo" style="display: none;"></div>
 
-    <hr>
+<div id="mapdiv"></div>
 
-    <footer>
-        <p>&copy; 2016 Ville de Lausanne.</p>
-    </footer>
-</div>
-<div id="app">
-
-
-</div>
+<span id=loader_message><p>Loading the application...<br>
+        <p>Chargement de l'application...</p><br><br>
+        <p>Please be patient</p>
+    </span>
 <script src="dist/bundle.js"></script>
+
+
+
+
+
+
 </body>
 </html>
