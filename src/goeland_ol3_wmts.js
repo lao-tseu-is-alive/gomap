@@ -182,23 +182,19 @@ const gomap = {
 
             // geolocation stuff so the map follow device pos
 
-            var geolocation = new ol.Geolocation({
-                projection: my_view.getProjection()
-            });
-            geolocation.setTracking(enableGeoLocation);
-
-
-            // update the HTML page when the geolocation information changes.
-            geolocation.on('change', function () {
-                geolocationChangeCallback(geolocation);
-            });
-
-            geolocation.on('error', function (error) {
-                var info = U.getEl('info');
-                info.innerHTML = error.message;
-                info.style.display = '';
-            });
-
+            var positionFeature = new ol.Feature();
+            positionFeature.setStyle(new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: 6,
+                    fill: new ol.style.Fill({
+                        color: '#ff0000'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: '#fff',
+                        width: 2
+                    })
+                })
+            }));
             var accuracyFeature = new ol.Feature();
             //TODO recuperer accuraxy et adapter rayon
             accuracyFeature.setStyle(new ol.style.Style({
@@ -214,31 +210,9 @@ const gomap = {
                 })
             }));
 
-            geolocation.on('change:accuracyGeometry', function () {
-                //TODO idealement il faut convertir le systeme de coord de la geometrie ci-dessous de wgs84 en 21781
-                //accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
-                if (DEV) {
-                    console.log("geolocation.on('change:accuracyGeometry'", geolocation.getAccuracyGeometry());
-                    //debugger;
-                }
-            });
-            var positionFeature = new ol.Feature();
-            positionFeature.setStyle(new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: 6,
-                    fill: new ol.style.Fill({
-                        color: '#ff0000'
-                    }),
-                    stroke: new ol.style.Stroke({
-                        color: '#fff',
-                        width: 2
-                    })
-                })
-            }));
-
-            geolocation.on('change:position', function () {
-                var coordinates = geolocation.getPosition();
-                var P21781 = Conv4326_in_21781(coordinates[0], coordinates[1]);
+            function updatePosition(geolocationRef, posFeatureRef, accuracyFeatureRef) {
+                const coordinates = geolocationRef.getPosition();
+                const P21781 = Conv4326_in_21781(coordinates[0], coordinates[1]);
                 if (DEV) {
                     console.log("geolocation.on('change:position", coordinates);
                     console.log("geolocation in 21781 : " + P21781.x + "," + P21781.y);
@@ -246,18 +220,47 @@ const gomap = {
                 }
                 const currentPosition = [P21781.x, P21781.y];
                 const  currentPointPosition = new ol.geom.Point(currentPosition);
-                positionFeature.setGeometry(currentPointPosition);
-                accuracyFeature.setGeometry(currentPointPosition);
+                posFeatureRef.setGeometry(currentPointPosition);
+                accuracyFeatureRef.setGeometry(currentPointPosition);
                 my_view.setCenter(currentPosition);
                 my_view.setZoom(8);
-
-                /*
-
+            }
 
 
-                 positionFeature.setGeometry(coordinates ?
-                 new ol.geom.Point(P21781.x , P21781.y) : null);
-                 */
+            var geolocation = new ol.Geolocation({
+                projection: my_view.getProjection(),
+                tracking: true,
+                trackingOptions: {
+                    enableHighAccuracy: true
+                }
+            });
+            geolocation.setTracking(enableGeoLocation);
+
+
+            // update the HTML page when the geolocation information changes.
+            geolocation.on('change', function () {
+                updatePosition(geolocation, positionFeature, accuracyFeature);
+                geolocationChangeCallback(geolocation);
+            });
+
+            geolocation.on('error', function (error) {
+                var info = U.getEl('info');
+                info.innerHTML = error.message;
+                info.style.display = '';
+            });
+
+            geolocation.on('change:accuracyGeometry', function () {
+                //TODO idealement il faut convertir le systeme de coord de la geometrie ci-dessous de wgs84 en 21781
+                //accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+                updatePosition(geolocation, positionFeature, accuracyFeature);
+                if (DEV) {
+                    console.log("geolocation.on('change:accuracyGeometry'", geolocation.getAccuracyGeometry());
+                    //debugger;
+                }
+            });
+
+            geolocation.on('change:position', function () {
+                updatePosition(geolocation, positionFeature, accuracyFeature);
             });
 
             var geolocation_layer = new ol.layer.Vector({
