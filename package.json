@@ -6,7 +6,7 @@
   "scripts": {
     "build_webpack_dist": "rimraf dist && NODE_ENV=production webpack",
     "clean_dist": "rimraf dist",
-    "deploy_2_vps": "rsync -rlptDv ./dist/ myvps:/var/www/gomap_gil_town/ && rsync -rlptDv ./examples/data myvps:/var/www/gomap_gil_town/",
+    "deploy_2_vps": "rsync -rlptDv ./dist/ myvps:/var/www/gomap_gil_town/ && rsync -rlptDv ./examples/data myvps:/var/www/gomap_gil_town/ && rsync -rlptDv ./server myvps:/var/www/gomap_gil_town/",
     "dev_webpack_server": "NODE_ENV=development node dev-server.js",
     "start": "concurrently \"npm run tsc:w\" \"npm run lite\" ",
     "lite": "lite-server",

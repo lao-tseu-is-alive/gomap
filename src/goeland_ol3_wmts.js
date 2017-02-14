@@ -11,14 +11,12 @@ proj4.defs("EPSG:21781", "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.4395833
 function Conv21781_in_4326(x, y) {
     const projSource = new proj4.Proj("EPSG:21781");
     const projDest = new proj4.Proj("EPSG:4326");
-    var pointSource = new proj4.Point(x + ", " + y);
-    return proj4.transform(projSource, projDest, pointSource);
+    return proj4.transform(projSource, projDest, [x,y]);
 }
 function Conv4326_in_21781(x, y) {
     const projSource = new proj4.Proj("EPSG:4326");
     const projDest = new proj4.Proj("EPSG:21781");
-    var pointSource = new proj4.Point(x + ", " + y);
-    return proj4.transform(projSource, projDest, pointSource);
+    return proj4.transform(projSource, projDest, [x,y]);
 }
 const gomap = {
         /**
@@ -214,8 +212,7 @@ const gomap = {
                 const coordinates = geolocationRef.getPosition();
                 const P21781 = Conv4326_in_21781(coordinates[0], coordinates[1]);
                 if (DEV) {
-                    console.log("geolocation.on('change:position", coordinates);
-                    console.log("geolocation in 21781 : " + P21781.x + "," + P21781.y);
+                    console.log("geolocation updatePosition : " + P21781.x + "," + P21781.y);
                     //debugger;
                 }
                 const currentPosition = [P21781.x, P21781.y];
@@ -254,7 +251,7 @@ const gomap = {
                 //accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
                 updatePosition(geolocation, positionFeature, accuracyFeature);
                 if (DEV) {
-                    console.log("geolocation.on('change:accuracyGeometry'", geolocation.getAccuracyGeometry());
+                    //console.log("geolocation.on('change:accuracyGeometry'", geolocation.getAccuracyGeometry());
                     //debugger;
                 }
             });

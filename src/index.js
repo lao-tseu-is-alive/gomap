@@ -90,13 +90,15 @@ function getMapClickCoordsXY(x,y) {
             console.log(formatGeoJSON.writeFeature(feature));
             console.log(formatWKT.writeFeature(feature));
         }
-        // put the attribute data of this feature somewhere
-        const CoordXY = U.getEl('obj_coordxy');
-        CoordXY.value = formatWKT.writeFeature(feature);
-        const obj_name = U.getEl('obj_name');
-        obj_name.value = feature_object.name;
-        const obj_url = U.getEl('obj_url');
-        obj_url.value = feature_object.infourl;
+        // put the attribute data of this feature in form fields
+        U.getEl('info_idgeoobject').innerText = `(${feature_object.idgeoobject})`;
+        U.getEl('obj_idgeoobject').value= feature_object.idgeoobject;
+        U.getEl('obj_coordxy').value = formatWKT.writeFeature(feature);
+        U.getEl('obj_name').value = feature_object.nom;
+        U.getEl('obj_infourl').value = feature_object.infourl;
+        U.getEl('obj_description').value = feature_object.description;
+        U.getEl('obj_date_begin').value = feature_object.datestart;
+        U.getEl('obj_date_end').value = feature_object.dateend;
 
     } else {
         // here would be a good place to handle insertion of new object
@@ -130,7 +132,12 @@ var current_view = map.getView();
 
 // now let's add another layer with geojson data
 const marker_cinema = require('./images/cinema.png');
-var geojson_url = '/data/cinema_geojson.json';
+//var geojson_url = '/data/cinema_geojson.json';
+if (DEV) {
+    var geojson_url = 'https://gomap.lausanne.ch/gomap-api/cinemas';
+} else {
+    var geojson_url = '/gomap-api/cinemas';
+}
 var cinema_layer = gomap.loadGeoJSONLayer(geojson_url,marker_cinema);
 
 searchAddress.attachEl();
