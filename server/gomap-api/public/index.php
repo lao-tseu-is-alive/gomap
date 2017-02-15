@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL);
 if (PHP_SAPI == 'cli-server') {
     // To help the built-in PHP dev server, check if the request was actually for
     // something which should probably be served as a static file
@@ -106,23 +107,59 @@ EOT;
 
     $data = $request->getParsedBody();
     $cinema_data = [];
-    $cinema_data['name'] = filter_var($data['name'], FILTER_SANITIZE_STRING);
-    $cinema_data['description'] = filter_var($data['description'], FILTER_SANITIZE_STRING);
-    $cinema_data['iconeurl'] = filter_var($data['iconeurl'], FILTER_SANITIZE_STRING);
-    $cinema_data['infourl'] = filter_var($data['infourl'], FILTER_SANITIZE_STRING);
-    $cinema_data['datestart'] = filter_var($data['datestart'], FILTER_SANITIZE_STRING);
-    $cinema_data['dateend'] = filter_var($data['dateend'], FILTER_SANITIZE_STRING);
-    $cinema_data['geom_point'] = filter_var($data['geom_point'], FILTER_SANITIZE_STRING);
+    $cinema_data['name'] = filter_var(trim($data['name']), FILTER_SANITIZE_STRING);
+
+    $cinema_data['description'] = filter_var(trim($data['description']), FILTER_SANITIZE_STRING);
+    $cinema_data['iconeurl'] = filter_var(trim($data['iconeurl']), FILTER_SANITIZE_STRING);
+    $cinema_data['infourl'] = filter_var(trim($data['infourl']), FILTER_SANITIZE_STRING);
+    $cinema_data['datestart'] = filter_var(trim($data['datestart']), FILTER_SANITIZE_STRING);
+    $cinema_data['dateend'] = filter_var(trim($data['dateend']), FILTER_SANITIZE_STRING);
+    $cinema_data['geom_point'] = filter_var(trim($data['geom_point']), FILTER_SANITIZE_STRING);
     try {
         $dbCon = dbGoConnect();
         $stmt   = $dbCon->prepare($sql);
-        $stmt->bindParam('name', $cinema_data['name'] );
-        $stmt->bindParam('description', $cinema_data['description'] );
-        $stmt->bindParam('iconeurl', $cinema_data['iconeurl'] );
-        $stmt->bindParam('infourl', $cinema_data['infourl'] );
-        $stmt->bindParam('datestart', $cinema_data['datestart'] );
-        $stmt->bindParam('dateend', $cinema_data['dateend'] );
-        $stmt->bindParam('geom_point', $cinema_data['geom_point'] );
+        if (strlen($cinema_data['name']) < 1 ) {
+            $cinema_data['name'] = null;
+            $stmt->bindParam('name', $cinema_data['name'],PDO::PARAM_NULL );
+        } else {
+            $stmt->bindParam('name', $cinema_data['name'],PDO::PARAM_STR );
+        }
+        if (strlen($cinema_data['description']) < 1 ) {
+            $cinema_data['description'] = null;
+            $stmt->bindParam('description', $cinema_data['description'],PDO::PARAM_NULL );
+        } else {
+            $stmt->bindParam('description', $cinema_data['description'] );
+        }
+        if (strlen($cinema_data['iconeurl']) < 1 ) {
+            $cinema_data['iconeurl'] = null;
+            $stmt->bindParam('iconeurl', $cinema_data['iconeurl'],PDO::PARAM_NULL );
+        } else {
+            $stmt->bindParam('iconeurl', $cinema_data['iconeurl'] );
+        }
+        if (strlen($cinema_data['infourl']) < 1 ) {
+            $cinema_data['infourl'] = null;
+            $stmt->bindParam('infourl', $cinema_data['infourl'],PDO::PARAM_NULL );
+        } else {
+            $stmt->bindParam('infourl', $cinema_data['infourl'] );
+        }
+        if (strlen($cinema_data['datestart']) < 1 ) {
+            $cinema_data['datestart'] = null;
+            $stmt->bindParam('datestart', $cinema_data['datestart'],PDO::PARAM_NULL );
+        } else {
+            $stmt->bindParam('datestart', $cinema_data['datestart'] );
+        }
+        if (strlen($cinema_data['dateend']) < 1 ) {
+            $cinema_data['dateend'] = null;
+            $stmt->bindParam('dateend', $cinema_data['dateend'],PDO::PARAM_NULL );
+        } else {
+            $stmt->bindParam('dateend', $cinema_data['dateend'] );
+        }
+        if (strlen($cinema_data['geom_point']) < 1 ) {
+            $cinema_data['geom_point'] = null;
+            $stmt->bindParam('geom_point', $cinema_data['geom_point'],PDO::PARAM_NULL );
+        } else {
+            $stmt->bindParam('geom_point', $cinema_data['geom_point'] );
+        }
         $stmt->execute();
         $cinema_id = $dbCon->lastInsertId();
         //echo(print_r($cinemas[0]['row_to_json']));
@@ -131,7 +168,9 @@ EOT;
 
     }
     catch (PDOException $e) {
-        return $response->write('{"error":{"text":'. $e->getMessage() .'}}');
+        return $response->write('{"error":{"text":'. $e->getMessage() . ',' .
+                                            '"parameters":'. json_encode(print_r($cinema_data)) . ',' .
+            '}}');
     }
 
 });

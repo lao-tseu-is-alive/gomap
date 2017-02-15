@@ -14,7 +14,7 @@ import Form from './showForm';
 import Info from './showInfo';
 
 
-function loadForm(){
+function loadForm() {
     "use strict";
     /* commented by cgil 8-2-2016 because System.import generates promise and IE crash
      System.import('./showForm')
@@ -25,7 +25,7 @@ function loadForm(){
     U.getEl('contentForm').innerHTML = Form;
 }
 
-function loadInfo(){
+function loadInfo() {
     "use strict";
     /* commented by cgil 8-2-2016 because System.import generates promise and IE crash
      System.import('./showInfo')
@@ -70,9 +70,9 @@ function updateGeolocationInfo(geolocation) {
 }
 
 
-function getMapClickCoordsXY(x,y) {
+function getMapClickCoordsXY(x, y) {
     //TODO add togle buton to check if we are in 'insert mode'
-    var feature = map.forEachFeatureAtPixel(map.getPixelFromCoordinate([x,y]), function(feature, layer) {
+    var feature = map.forEachFeatureAtPixel(map.getPixelFromCoordinate([x, y]), function (feature, layer) {
         //you can add a condition on layer to restrict the listener
         return feature;
     });
@@ -81,7 +81,7 @@ function getMapClickCoordsXY(x,y) {
         var formatGeoJSON = new ol.format.GeoJSON();
         var formatWKT = new ol.format.WKT();
         var feature_object = feature.getProperties();
-        if(DEV) {
+        if (DEV) {
             const strObj = U.dumpObject2String(feature_object);
             console.log(`## In getMapClickCoordsXY(${x},${y}) 
                     - found feature : \n ${strObj}`);
@@ -92,7 +92,7 @@ function getMapClickCoordsXY(x,y) {
         }
         // put the attribute data of this feature in form fields
         U.getEl('info_idgeoobject').innerText = `(${feature_object.idgeoobject})`;
-        U.getEl('obj_idgeoobject').value= feature_object.idgeoobject;
+        U.getEl('obj_idgeoobject').value = feature_object.idgeoobject;
         U.getEl('obj_coordxy').value = formatWKT.writeFeature(feature);
         U.getEl('obj_name').value = feature_object.nom;
         U.getEl('obj_infourl').value = feature_object.infourl;
@@ -102,7 +102,9 @@ function getMapClickCoordsXY(x,y) {
 
     } else {
         // here would be a good place to handle insertion of new object
-        //gomap.addNewPointFeature2Layer(cinema_layer,x,y,'New cinema !');
+        //gomap.addNewPointFeature2Layer(gomap.getGeolocationLayerRef(),x,y,'New cinema !');
+        //for now we just store object postion
+        U.getEl('obj_coordxy').value = `POINT(${x} ${y})`;
     }
 
 }
@@ -118,17 +120,17 @@ var map = gomap.init_map('mapdiv', position_Lausanne, zoom_level, getMapClickCoo
 
 
 /*
-// on inclut l'image comme ressource dans le bundle webpack
-const marker_blue = require('./images/marker_blue_32x58.png');
-var coord_pfa3_180_stfrancois = [538224.21, 152378.17];
-var eglise_stfrancois = new ol.Feature(new ol.geom.Point(coord_pfa3_180_stfrancois));
-eglise_stfrancois.setStyle(createIconStyleCenterBottom(marker_blue));
-var marker_layer = new ol.layer.Vector({source: new ol.source.Vector({features: [eglise_stfrancois]})});
-map.addLayer(marker_layer);
-var current_view = map.getView();
-//current_view.setCenter(coord_pfa3_180_stfrancois);
-//current_view.setZoom(6);
-*/
+ // on inclut l'image comme ressource dans le bundle webpack
+ const marker_blue = require('./images/marker_blue_32x58.png');
+ var coord_pfa3_180_stfrancois = [538224.21, 152378.17];
+ var eglise_stfrancois = new ol.Feature(new ol.geom.Point(coord_pfa3_180_stfrancois));
+ eglise_stfrancois.setStyle(createIconStyleCenterBottom(marker_blue));
+ var marker_layer = new ol.layer.Vector({source: new ol.source.Vector({features: [eglise_stfrancois]})});
+ map.addLayer(marker_layer);
+ var current_view = map.getView();
+ //current_view.setCenter(coord_pfa3_180_stfrancois);
+ //current_view.setZoom(6);
+ */
 
 // now let's add another layer with geojson data
 const marker_cinema = require('./images/cinema.png');
@@ -138,7 +140,7 @@ if (DEV) {
 } else {
     var geojson_url = '/gomap-api/cinemas';
 }
-var cinema_layer = gomap.loadGeoJSONLayer(geojson_url,marker_cinema);
+var cinema_layer = gomap.loadGeoJSONLayer(geojson_url, marker_cinema);
 
 searchAddress.attachEl();
 
@@ -146,23 +148,81 @@ U.getEl('loader_message').style.display = 'none';
 //////////////////////////////////////////////////////////////////////
 //// EVENT HANDLERS
 
-U.getEl('track').addEventListener('change', function() {
+U.getEl('track').addEventListener('change', function () {
     gomap.getGeolocationRef().setTracking(this.checked);
 });
 
 
-U.getEl('showForm').addEventListener('click', () => {activateForm();});
+U.getEl('showForm').addEventListener('click', () => {
+    activateForm();
+});
 
-U.getEl('showInfo').addEventListener('click', () => {activateInfo();});
+U.getEl('showInfo').addEventListener('click', () => {
+    activateInfo();
+});
 
-$('.clickable').on('click',function(){
+$('.clickable').on('click', function () {
     hidePanels();
     //var effect = $(this).data('effect');
     //$(this).closest('.panel')[effect]();
-})
+});
+$('#save_data').on('click', function (event) {
+    if (DEV) {
+        console.log('about to save');
+        var post_url = 'https://gomap.lausanne.ch/gomap-api/cinema/new';
+    } else {
+        var post_url = '/gomap-api/cinema/new';
+    }
+
+    event.preventDefault();
+    const default_point = 'POINT(537603.73 152608.98)';
+
+    var params = {
+        idgeoobject: U.getEl('obj_idgeoobject').value,
+        name: U.getEl('obj_name').value,
+        description: U.getEl('obj_description').value,
+        iconeurl: U.getEl('obj_iconeurl').value,
+        infourl: U.getEl('obj_infourl').value,
+        datestart: U.getEl('obj_date_begin').value,
+        dateend: U.getEl('obj_date_end').value,
+        geom_point: U.getEl('obj_coordxy').value
+    };
+
+
+    var jqxhr = $.ajax({
+        type: 'POST',
+        url: post_url,
+        data: params,
+        dataType: "text",
+        success: function (data, textStatus, jqXHR) {
+            //alert("POST Success :\n textStatus :" + textStatus + "\n data : " + data);
+            console.log("POST Success with url : " + post_url);
+            console.log(jqXHR);
+
+            $('#toolbar_status').text('LA SAUVEGARDE DU POLYGONE EST OK');
+            //$('#toolbar_status').focus();
+            /*
+             ol_controls['polygon'].deactivate();
+             ol_controls['modify'].deactivate();
+             // si crinou appelle cette page alors on appelle sa fonction avec la bbox
+             ol_vectors.refresh();
+             ol_vectors.redraw();
+             */
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            //alert("## POST error ##\n textStatus :" + textStatus + "\n ajaxError : " + errorThrown.toString());
+            console.log("POST error with url : " + post_url);
+            console.log("## POST jqXHR : ", jqXHR);
+            console.log("## POST textStatus : ", textStatus);
+            console.log("## POST errorThrown : ", errorThrown);
+            console.log("## POST jqXHR.responseText : ", jqXHR.responseText);
+        }
+    });
+
+
+});
 
 //////////////////////////////////////////////////////////////////////
-
 
 
 //

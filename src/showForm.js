@@ -10,7 +10,8 @@ const Form = `
         <h3 class="panel-title">Information sur cet objet <span id="info_idgeoobject"></span></h3>
             <span class="pull-right clickable glyphicon glyphicon-remove" data-effect="slideUp"><i class="fa fa-times"></i></span>
       </div>
-      <div class="panel-body">      
+      <div class="panel-body">
+            <div id="toolbar_status'"></div>
       
 <form class="form-horizontal">
    <input type="hidden" id="obj_idgeoobject" name="idgeoobject">
@@ -70,8 +71,8 @@ const Form = `
   -->
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
-      <button type="submit" class="btn btn-default">SAUVER</button>
-      <button type="submit" class="btn btn-default">EFFACER</button>
+      <button id="save_data" class="btn btn-default">SAUVER</button>
+      <button id="delete_data" class="btn btn-default">EFFACER</button>
     </div>
   </div>
 </form>
