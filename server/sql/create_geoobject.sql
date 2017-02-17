@@ -42,3 +42,4 @@ ALTER TABLE public.geoobject
 
 GRANT SELECT ON TABLE public.geoobject TO public;
 GRANT ALL ON TABLE public.geoobject TO GROUP gomap_admin WITH GRANT OPTION;
+GRANT USAGE ON SEQUENCE public.geoobject_idgeoobject_seq TO gomap_admin;
