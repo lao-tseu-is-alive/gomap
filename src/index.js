@@ -4,14 +4,70 @@
 
 
 import 'openlayers/css/ol.css';
-
+import './style/bootstrap-datetimepicker.css';
 import css from './style/base.css';
+import 'jquery';
+import moment from 'moment';
+import 'datetimepicker';
 import ol from 'openlayers';
 import gomap from './goeland_ol3_wmts';
 import * as U from './htmlUtils';
 import searchAddress from './searchAddress';
-import Form from './showForm';
+import Form from './showFormGoChantier';
 import Info from './showInfo';
+
+
+searchAddress.attachEl();
+loadForm();
+loadInfo();
+///////////////// DEBUT GESTION DES CHAMPS DATES
+// http://eonasdan.github.io/bootstrap-datetimepicker/Options/#options
+// http://momentjs.com/docs/#/displaying/format/
+const date_options = {
+    format: 'DD/MM/YYYY',
+    locale: 'fr',
+    minDate: moment(),
+    useCurrent: false
+};
+$('#obj_planified_date_begin').datetimepicker(date_options);
+$('#obj_planified_date_end').datetimepicker(date_options);
+$('#obj_real_date_begin').datetimepicker(date_options);
+$('#obj_real_date_end').datetimepicker(date_options);
+
+$("#obj_planified_date_begin").on("dp.change", function (e) {
+    $('#obj_planified_date_end').data("DateTimePicker").minDate(e.date);
+});
+$("#obj_planified_date_end").on("dp.change", function (e) {
+    $('#obj_planified_date_begin').data("DateTimePicker").maxDate(e.date);
+});
+
+$("#obj_real_date_begin").on("dp.change", function (e) {
+    $('#obj_real_date_end').data("DateTimePicker").minDate(e.date);
+});
+$("#obj_real_date_end").on("dp.change", function (e) {
+    $('#obj_real_date_begin').data("DateTimePicker").maxDate(e.date);
+});
+
+
+///////////////// FIN GESTION DES CHAMPS DATES
+
+var lon = 537892.8;
+var lat = 152095.7;
+var zoom_level = 4;
+var position_Lausanne = [lon, lat];
+
+var map = gomap.init_map('mapdiv', position_Lausanne, zoom_level, getMapClickCoordsXY, U.getEl('track').checked, updateGeolocationInfo);
+
+
+if (DEV) {
+    var geojson_url = 'https://gomap.lausanne.ch/gomap-api/chantiers';
+} else {
+    var geojson_url = '/gomap-api/chantiers';
+}
+var chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url, false);
+
+
+U.getEl('loader_message').style.display = 'none';
 
 
 function loadForm() {
@@ -76,7 +132,10 @@ function getMapClickCoordsXY(x, y) {
         //you can add a condition on layer to restrict the listener
         return feature;
     });
-    if (feature) {
+    if (!feature) {
+        // here would be a good place to handle insertion of new object
+        //U.getEl('obj_coordxy').value = `POINT(${x} ${y})`;
+    } else {
         //here you can add you code to display the coordinates or whatever you want to do
         var formatGeoJSON = new ol.format.GeoJSON();
         var formatWKT = new ol.format.WKT();
@@ -91,60 +150,24 @@ function getMapClickCoordsXY(x, y) {
             console.log(formatWKT.writeFeature(feature));
         }
         // put the attribute data of this feature in form fields
-        U.getEl('info_idgeoobject').innerText = `(${feature_object.idgeoobject})`;
-        U.getEl('obj_idgeoobject').value = feature_object.idgeoobject;
+        U.getEl('info_idgochantier').innerText = `(${feature_object.idgochantier})`;
+        U.getEl('obj_idgochantier').value = feature_object.idgochantier;
         U.getEl('obj_coordxy').value = formatWKT.writeFeature(feature);
         U.getEl('obj_name').value = feature_object.nom;
-        U.getEl('obj_infourl').value = feature_object.infourl;
         U.getEl('obj_description').value = feature_object.description;
-        U.getEl('obj_date_begin').value = feature_object.datestart;
-        U.getEl('obj_date_end').value = feature_object.dateend;
+        //debugger;
+        $('#obj_planified_date_begin').data("DateTimePicker").date(moment(feature_object.planified_datestart, 'YYYY-MM-DD'));
+        $('#obj_planified_date_end').data("DateTimePicker").date(moment(feature_object.planified_dateend, 'YYYY-MM-DD'));
 
-    } else {
-        // here would be a good place to handle insertion of new object
-        //gomap.addNewPointFeature2Layer(gomap.getGeolocationLayerRef(),x,y,'New cinema !');
-        //for now we just store object postion
-        U.getEl('obj_coordxy').value = `POINT(${x} ${y})`;
+        $('#obj_real_date_begin').data("DateTimePicker").date(moment(feature_object.real_datestart, 'YYYY-MM-DD'));
+        $('#obj_real_date_end').data("DateTimePicker").date(moment(feature_object.real_dateend, 'YYYY-MM-DD'));
+        activateForm();
+
     }
 
 }
 
 
-var lon = 537892.8;
-var lat = 152095.7;
-var zoom_level = 4;
-var position_Lausanne = [lon, lat];
-loadForm();
-loadInfo();
-var map = gomap.init_map('mapdiv', position_Lausanne, zoom_level, getMapClickCoordsXY, U.getEl('track').checked, updateGeolocationInfo);
-
-
-/*
- // on inclut l'image comme ressource dans le bundle webpack
- const marker_blue = require('./images/marker_blue_32x58.png');
- var coord_pfa3_180_stfrancois = [538224.21, 152378.17];
- var eglise_stfrancois = new ol.Feature(new ol.geom.Point(coord_pfa3_180_stfrancois));
- eglise_stfrancois.setStyle(createIconStyleCenterBottom(marker_blue));
- var marker_layer = new ol.layer.Vector({source: new ol.source.Vector({features: [eglise_stfrancois]})});
- map.addLayer(marker_layer);
- var current_view = map.getView();
- //current_view.setCenter(coord_pfa3_180_stfrancois);
- //current_view.setZoom(6);
- */
-
-// now let's add another layer with geojson data
-const marker_cinema = require('./images/cinema.png');
-//var geojson_url = '/data/cinema_geojson.json';
-if (DEV) {
-    var geojson_url = 'https://gomap.lausanne.ch/gomap-api/cinemas';
-} else {
-    var geojson_url = '/gomap-api/cinemas';
-}
-var cinema_layer = gomap.loadGeoJSONLayer(geojson_url, marker_cinema);
-
-searchAddress.attachEl();
-
-U.getEl('loader_message').style.display = 'none';
 //////////////////////////////////////////////////////////////////////
 //// EVENT HANDLERS
 
@@ -169,29 +192,41 @@ $('.clickable').on('click', function () {
 $('#save_data').on('click', function (event) {
     if (DEV) {
         console.log('about to save');
-        var post_url = 'https://gomap.lausanne.ch/gomap-api/cinema/new';
+        var post_url = 'https://gomap.lausanne.ch/gomap-api/chantier/save/';
     } else {
-        var post_url = '/gomap-api/cinema/new';
+        var post_url = '/gomap-api/chantier/save/';
     }
 
     event.preventDefault();
-    const default_point = 'POINT(537603.73 152608.98)';
 
+    const planed_datestart = $('#obj_planified_date_begin').data("DateTimePicker").date() === null ?
+        '' : $('#obj_planified_date_begin').data("DateTimePicker").date().format('YYYY-MM-DD');
+    const planed_dateend = $('#obj_planified_date_end').data("DateTimePicker").date() === null ?
+        '' : $('#obj_planified_date_end').data("DateTimePicker").date().format('YYYY-MM-DD');
+    const real_datestart = $('#obj_real_date_begin').data("DateTimePicker").date() === null ?
+        '' : $('#obj_real_date_begin').data("DateTimePicker").date().format('YYYY-MM-DD');
+    const real_dateend = $('#obj_real_date_end').data("DateTimePicker").date() === null ?
+        '' : $('#obj_real_date_end').data("DateTimePicker").date().format('YYYY-MM-DD');
+    const idgochantier = U.getEl('obj_idgochantier').value;
     var params = {
-        idgeoobject: U.getEl('obj_idgeoobject').value,
+        idgochantier: idgochantier,
         name: U.getEl('obj_name').value,
         description: U.getEl('obj_description').value,
-        iconeurl: U.getEl('obj_iconeurl').value,
-        infourl: U.getEl('obj_infourl').value,
-        datestart: U.getEl('obj_date_begin').value,
-        dateend: U.getEl('obj_date_end').value,
-        geom_point: U.getEl('obj_coordxy').value
+        planified_datestart: planed_datestart,
+        planified_dateend: planed_dateend,
+        real_datestart: real_datestart,
+        real_dateend: real_dateend,
+        geom_polygon: U.getEl('obj_coordxy').value
     };
+
+    if (DEV) {
+        console.log(params);
+    }
 
 
     var jqxhr = $.ajax({
         type: 'POST',
-        url: post_url,
+        url: post_url + idgochantier,
         data: params,
         dataType: "text",
         success: function (data, textStatus, jqXHR) {

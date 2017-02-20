@@ -57,8 +57,28 @@ $app->get('/chantiers', function (Request $request, Response $response, $args) {
     return $response->write(getChantiers());
 });
 //TODO  get user id and check if it's authorized to save and then use it in idcreator binding
-$app->post('/chantiers/new', function (Request $request, Response $response) {
-    return $response->write(newChantiers($request));
+$app->post('/chantier/new', function (Request $request, Response $response) {
+    $server_response = newChantiers($request);
+    if (strpos($server_response, '{"error":') === false) {
+        return $response->write($server_response);
+    } else {
+        $newResponse = $response->withStatus(502);
+        return $newResponse ->write($server_response);
+    }
+
+});
+
+//TODO  get user id and check if it's authorized to save and then use it in idcreator binding
+$app->post('/chantier/save/{id}', function (Request $request, Response $response, $args) {
+    $chantier_id = (int)$args['id'];
+    $server_response = saveChantiers($request, $chantier_id);
+    if (strpos($server_response, '{"error":') === false) {
+        return $response->write($server_response);
+    } else {
+        $newResponse = $response->withStatus(502);
+        return $newResponse ->write($server_response);
+    }
+
 });
 
 

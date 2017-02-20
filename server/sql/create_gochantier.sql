@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS public.gochantier;
---DROP SEQUENCE public.gochantier_idgochantier_seq;
---DROP INDEX geoobject_idgeoobjects_uindex;
+DROP SEQUENCE public.gochantier_idgochantier_seq;
+DROP INDEX geoobject_idgeoobjects_uindex;
 
 CREATE SEQUENCE public.gochantier_idgochantier_seq
 INCREMENT 1
@@ -24,8 +24,10 @@ CREATE TABLE gochantier
   isvalidated      BOOLEAN DEFAULT FALSE NOT NULL,
   iduservalidator  INTEGER,
   datevalidation   TIMESTAMP,
-  datestart        DATE,
-  dateend          DATE
+  planified_datestart        DATE,
+  planified_dateend          DATE,
+  real_datestart        DATE,
+  real_dateend          DATE
 );
 CREATE UNIQUE INDEX gochantier_idgochantier_uindex
   ON gochantier (idgochantier);
@@ -40,3 +42,16 @@ ALTER TABLE public.gochantier
 GRANT SELECT ON TABLE public.gochantier TO public;
 GRANT ALL ON TABLE public.gochantier TO GROUP gomap_admin WITH GRANT OPTION;
 GRANT USAGE ON SEQUENCE public.gochantier_idgochantier_seq TO gomap_admin;
+
+INSERT INTO gochantier(nom,description,idcreator,
+                      planified_datestart,planified_dateend,
+                      real_datestart,real_dateend,
+                       geom_polygon)
+    VALUES ('Chantier de test numéro 1', 'Ceci est juste une chantier de test', 7,
+            '2017-02-22', '2017-03-15', NULL, NULL,
+            st_geomfromtext('POLYGON(( 537629.3 152622.2,
+                              537627.1 152616.1,
+                              537636.3 152612.5,
+                              537638.6 152618.6,
+                              537629.3 152622.2))', 21781)
+    )

@@ -11,12 +11,12 @@ proj4.defs("EPSG:21781", "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.4395833
 function Conv21781_in_4326(x, y) {
     const projSource = new proj4.Proj("EPSG:21781");
     const projDest = new proj4.Proj("EPSG:4326");
-    return proj4.transform(projSource, projDest, [x,y]);
+    return proj4.transform(projSource, projDest, [x, y]);
 }
 function Conv4326_in_21781(x, y) {
     const projSource = new proj4.Proj("EPSG:4326");
     const projDest = new proj4.Proj("EPSG:21781");
-    return proj4.transform(projSource, projDest, [x,y]);
+    return proj4.transform(projSource, projDest, [x, y]);
 }
 const gomap = {
         /**
@@ -199,7 +199,7 @@ const gomap = {
                 image: new ol.style.Circle({
                     radius: 20,
                     fill: new ol.style.Fill({
-                        color: [255,0,0,0.3]
+                        color: [255, 0, 0, 0.3]
                     }),
                 }),
                 stroke: new ol.style.Stroke({
@@ -216,7 +216,7 @@ const gomap = {
                     //debugger;
                 }
                 const currentPosition = [P21781.x, P21781.y];
-                const  currentPointPosition = new ol.geom.Point(currentPosition);
+                const currentPointPosition = new ol.geom.Point(currentPosition);
                 posFeatureRef.setGeometry(currentPointPosition);
                 accuracyFeatureRef.setGeometry(currentPointPosition);
                 my_view.setCenter(currentPosition);
@@ -276,24 +276,22 @@ const gomap = {
 
         getMapRef: function () {
             return this._olMap;
-        }
-        ,
+        },
         getVieRef: function () {
             return this._olView;
-        }
-        ,
+        },
         getGeolocationRef: function () {
             return this._geolocation;
-        }
-        ,
+        },
         getGeolocationLayerRef: function () {
             return this._geolocationLayer;
-        }
-        ,
+        },
         getGeoJSONLayerRef: function () {
             return this._GeoJSONLayer;
-        }
-        ,
+        },
+        getGeoJSONPolygonLayerRef: function () {
+            return this._GeoJSONPolygonLayer;
+        },
 
 
         loadGeoJSONLayer: function (geojson_url, layer_icon) {
@@ -318,6 +316,86 @@ const gomap = {
             this._GeoJSONLayer = newLayer;
             // use a closure so that inner function get the correct reference to map object
             map_ref.addLayer(newLayer);
+            var listenerKey = vectorSource.on('change', function (e) {
+                if (vectorSource.getState() == 'ready') {
+                    //TODO maybe add "loading icon" and here where to hide it
+                    // retrieve extent of all features to zoom only when loading of the layer via Ajax XHR is complete
+                    var extent = newLayer.getSource().getExtent();
+                    //TODO activate insert/edit toolbar buttons only when layer has finished loading
+                    if (DEV) {
+                        console.log("# Finished Loading Layer :" + geojson_url, e);
+                    }
+                    map_ref.getView().fit(extent, map_ref.getSize());
+                    // and unregister the "change" listener
+                    ol.Observable.unByKey(listenerKey);
+                }
+            });
+            return newLayer;
+        },
+
+        loadGeoJSONPolygonLayer: function (geojson_url, allowEditing) {
+            "use strict";
+
+            var vectorSource = new ol.source.Vector({
+                url: geojson_url,
+                format: new ol.format.GeoJSON({
+                    defaultDataProjection: 'EPSG:21781',
+                    projection: 'EPSG:21781'
+                })
+            });
+            // https://openlayers.org/en/latest/examples/draw-and-modify-features.html
+            var newLayer = new ol.layer.Vector({
+                source: vectorSource,
+                style: new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: 'rgba(255, 0, 0, 0.8)'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: '#ffcc33',
+                        width: 3
+                    }),
+                    image: new ol.style.Circle({
+                        radius: 9,
+                        fill: new ol.style.Fill({
+                            color: '#ffcc33'
+                        })
+                    })
+                })
+            });
+            var map_ref = this._olMap;
+            this._GeoJSONPolygonLayer = newLayer;
+            // use a closure so that inner function get the correct reference to map object
+            map_ref.addLayer(newLayer);
+
+            var select = new ol.interaction.Select({ wrapX: false      });
+
+            var modify = new ol.interaction.Modify({
+                features: select.getFeatures(),
+                // the SHIFT key must be pressed to delete vertices, so
+                // that new vertices can be drawn at the same position
+                // of existing vertices
+                deleteCondition: function (event) {
+                    return ol.events.condition.shiftKeyOnly(event) &&
+                        ol.events.condition.singleClick(event);
+                }
+            });
+            map_ref.addInteraction(select);
+            map_ref.addInteraction(modify);
+
+            var draw; // global so we can remove it later
+
+            function addInteraction() {
+                draw = new ol.interaction.Draw({
+                    features: vectorSource.getFeatures(), //TOD find the correct object to pass
+                    type: 'Polygon' /** @type {ol.geom.GeometryType} */
+                });
+                map_ref.addInteraction(draw);
+            }
+
+            if (allowEditing) {
+                addInteraction();
+            }
+
             var listenerKey = vectorSource.on('change', function (e) {
                 if (vectorSource.getState() == 'ready') {
                     //TODO maybe add "loading icon" and here where to hide it

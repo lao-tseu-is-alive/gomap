@@ -26,14 +26,15 @@ const plugins = PRODUCTION ? [
             }
         }),
         new ExtractTextPlugin('style-[contenthash:10].css'),
-        new HTMLWebpackPlugin({ template: 'index_webpack_template.html'})
+        new HTMLWebpackPlugin({template: 'index_webpack_template.html'})
     ] : [
         new webpack.HotModuleReplacementPlugin(),
 
         new webpack.ProvidePlugin({
             'jQuery': 'jquery',
             '$': 'jquery',
-            'global.jQuery': 'jquery'
+            'global.jQuery': 'jquery',
+            'windows.jQuery': 'jquery'
         })
 
     ];
@@ -47,10 +48,10 @@ plugins.push(
 
 const cssIdentifier = PRODUCTION ? '[hash:base64:10]' : '[path][name]---[local]';
 
-var cssLoader = PRODUCTION ?	ExtractTextPlugin.extract({
+var cssLoader = PRODUCTION ? ExtractTextPlugin.extract({
         loader: 'css-loader?minimize&localIdentName=' + cssIdentifier
     })
-    : 	['style-loader', 'css-loader?localIdentName=' + cssIdentifier];
+    : ['style-loader', 'css-loader?localIdentName=' + cssIdentifier];
 
 // for inline css
 cssLoader = ['style-loader', 'css-loader?localIdentName=' + cssIdentifier];
@@ -69,32 +70,34 @@ module.exports = {
             test: /\.js$/,
             loaders: ['babel-loader'],
             exclude: /node_modules/
-        },/* {
-            test: /\.(png|jpg)$/,
-            loaders: ['file-loader'],
-            exclude: /node_modules/
-        }
-        ,*/ {
-         test: /\.(png|jpg|gif)$/,
-         loaders: ['url-loader?limit=10000&name=images/[hash:12].[ext]'],
+        }, /* {
+         test: /\.(png|jpg)$/,
+         loaders: ['file-loader'],
          exclude: /node_modules/
-         }, {
-         test: /\.css$/,
-         loaders: cssLoader,
-         //exclude: /node_modules/
          }
+         ,*/ {
+            test: /\.(png|jpg|gif)$/,
+            loaders: ['url-loader?limit=10000&name=images/[hash:12].[ext]'],
+            exclude: /node_modules/
+        }, {
+            test: /\.css$/,
+            loaders: cssLoader,
+            //exclude: /node_modules/
+        }
         ]
     },
     output: {
         path: path.join(__dirname, 'dist'),
         publicPath: PRODUCTION ? '' : '/dist/',
         filename: PRODUCTION ? 'bundle.[hash:12].min.js' : 'bundle.js'
-    }
-    /*,
+    },
     resolve: {
         alias: {
-            'jquery-ui': 'jquery-ui-dist/jquery-ui.js'
+            // Force all modules to use the same jquery version.
+            'jquery': path.join(__dirname, 'node_modules/jquery/src/jquery'),
+            'datetimepicker': path.join(__dirname, 'node_modules/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.js')
         }
     },
-    */
-};
+
+}
+;
