@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- TODO remove dependency on jquery as global external only needed by clik bootstrap
+         so basic idea would be to put all bootstrap handling in webpack
+    -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <title>OpenLayers 3 WebApp</title>
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment-with-locales.min.js"></script>-->
@@ -37,11 +40,11 @@
         <div id="navbar" class="navbar-collapse collapse">
             <div class="navbar-form navbar-right">
                 <div class="form-group">
-                    <select class="form-control" id="togleMode">
-                        <option value="Navigate">Mode Navigation</option>
-                        <option value="Create">Mode création</option>
-                        <option value="Edit">Mode édition</option>
-                        <option value="Edit">Mode éffacement</option>
+                    <select class="form-control" id="toggleMode">
+                        <option value="NAVIGATE">Mode Navigation</option>
+                        <option value="CREATE">Mode création</option>
+                        <option value="EDIT">Mode édition</option>
+                        <!--<option value="DELETE">Mode éffacement</option>-->
                     </select>
                     <button id="showForm" class="btn btn-primary " href="#">Formulaire</button>
                     <button id="showInfo" class="btn btn-primary " href="#">Informations</button>

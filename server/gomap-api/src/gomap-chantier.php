@@ -153,10 +153,13 @@ EOT;
     $request_data = $request->getParsedBody();
     $data = [];
     $data['idgochantier'] = filter_var(trim($request_data['idgochantier']), FILTER_SANITIZE_NUMBER_INT);
-
+    if ($id_chantier == 0) {
+        return '{"error":{"reason ": "idgochantier is zero ","data":' . json_encode($data) . '}}';
+    }
     if ($id_chantier <> $data['idgochantier']) {
         return '{"error":{"reason ": "' . $id_chantier . '<>' . $data['idgochantier'] . '","data":' . json_encode($data) . '}}';
     }
+
 
     $data['name'] = filter_var(trim($request_data['name']), FILTER_SANITIZE_STRING);
     $data['description'] = filter_var(trim($request_data['description']), FILTER_SANITIZE_STRING);

@@ -2,7 +2,7 @@
  * Created by cgil on 2/1/17.
  */
 
-//TODO: add method to clear and assign values to form
+//TODO: add method to clear and assign values to form here
 
 const Form = `
 <div class="panel panel-info">
@@ -85,10 +85,11 @@ const Form = `
   </div>
   
   
-  <div class="form-group">
+  <div id="edit_buttons" class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
       <button id="save_data" class="btn btn-default">SAUVER</button>
-      <button id="delete_data" class="btn btn-default">EFFACER</button>
+      <!--<button id="delete_data" class="btn btn-default">EFFACER</button>-->
+      <div id="formFeedback" class="alert alert-info" role="alert">...</div>
     </div>
   </div>
 </form>

@@ -19,8 +19,8 @@ const entry = PRODUCTION ? [
 
 const plugins = PRODUCTION ? [
         new webpack.optimize.UglifyJsPlugin({
-            comments: true,
-            mangle: false,
+            comments: false,
+            mangle: true,
             compress: {
                 warnings: true
             }

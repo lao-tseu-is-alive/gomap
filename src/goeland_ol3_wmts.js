@@ -121,8 +121,8 @@ const gomap = {
                 return array_wmts;
             }
 
-            var MAX_EXTENT_LIDAR = [532500, 149000, 545625, 161000]; // lidar 2012
-            var swissProjection = new ol.proj.Projection({
+            const MAX_EXTENT_LIDAR = [532500, 149000, 545625, 161000]; // lidar 2012
+            const swissProjection = new ol.proj.Projection({
                 code: 'EPSG:21781',
                 extent: MAX_EXTENT_LIDAR,
                 units: 'm'
@@ -171,7 +171,7 @@ const gomap = {
                     if (U.function_exist(clickCallback)) {
                         clickCallback(evt.coordinate[0], evt.coordinate[1]);
                     } else {
-                        // nobody cares about the coord of this click ?
+                        // does nobody really care about the coord of this click ?
                     }
                 } else {
                     window.parent.getMapClickCoordsXY(evt.coordinate);
@@ -292,8 +292,11 @@ const gomap = {
         getGeoJSONPolygonLayerRef: function () {
             return this._GeoJSONPolygonLayer;
         },
+        getNewPolygonLayerRef: function () {
+            return this._NewPolygonLayer;
+        },
 
-
+        //TODO: refactor this name to : loadGeoJSONPointLayer
         loadGeoJSONLayer: function (geojson_url, layer_icon) {
             "use strict";
             function getIconStyleCenterBottom(imagePath) {
@@ -333,10 +336,11 @@ const gomap = {
             return newLayer;
         },
 
-        loadGeoJSONPolygonLayer: function (geojson_url, allowEditing) {
+        // TODO: have a nice way of handling editing features  2 modes possible: SELECT & Modify OR ADD
+        loadGeoJSONPolygonLayer: function (geojson_url) {
             "use strict";
 
-            var vectorSource = new ol.source.Vector({
+            const vectorSource = new ol.source.Vector({
                 url: geojson_url,
                 format: new ol.format.GeoJSON({
                     defaultDataProjection: 'EPSG:21781',
@@ -344,7 +348,10 @@ const gomap = {
                 })
             });
             // https://openlayers.org/en/latest/examples/draw-and-modify-features.html
-            var newLayer = new ol.layer.Vector({
+            // https://openlayers.org/en/latest/examples/modify-features.html
+            // TODO use a property of the geojson query to display color
+            // or a style function  : http://openlayersbook.github.io/ch06-styling-vector-layers/example-07.html
+            const newLayer = new ol.layer.Vector({
                 source: vectorSource,
                 style: new ol.style.Style({
                     fill: new ol.style.Fill({
@@ -362,39 +369,10 @@ const gomap = {
                     })
                 })
             });
-            var map_ref = this._olMap;
+            const map_ref = this._olMap;
             this._GeoJSONPolygonLayer = newLayer;
             // use a closure so that inner function get the correct reference to map object
             map_ref.addLayer(newLayer);
-
-            var select = new ol.interaction.Select({ wrapX: false      });
-
-            var modify = new ol.interaction.Modify({
-                features: select.getFeatures(),
-                // the SHIFT key must be pressed to delete vertices, so
-                // that new vertices can be drawn at the same position
-                // of existing vertices
-                deleteCondition: function (event) {
-                    return ol.events.condition.shiftKeyOnly(event) &&
-                        ol.events.condition.singleClick(event);
-                }
-            });
-            map_ref.addInteraction(select);
-            map_ref.addInteraction(modify);
-
-            var draw; // global so we can remove it later
-
-            function addInteraction() {
-                draw = new ol.interaction.Draw({
-                    features: vectorSource.getFeatures(), //TOD find the correct object to pass
-                    type: 'Polygon' /** @type {ol.geom.GeometryType} */
-                });
-                map_ref.addInteraction(draw);
-            }
-
-            if (allowEditing) {
-                addInteraction();
-            }
 
             var listenerKey = vectorSource.on('change', function (e) {
                 if (vectorSource.getState() == 'ready') {
@@ -411,8 +389,8 @@ const gomap = {
                 }
             });
             return newLayer;
-        }
-        ,
+        },
+
         addNewPointFeature2Layer: function (layer, coord_x, coord_y, name) {
             "use strict";
             const point = new ol.geom.Point([coord_x, coord_y]);
@@ -422,8 +400,163 @@ const gomap = {
             });
             const vector_source = layer.getSource();
             vector_source.addFeature(feature);
-        }
-        ,
+        },
+
+        setMode: function (newMode, endDrawCallback) {
+            function addNewPolygon2Layer(layer, callbackOnDrawEnd) {
+                const map_ref = this._olMap;
+                const features = new ol.Collection();
+                const featureOverlay = new ol.layer.Vector({
+                    source: new ol.source.Vector({features: features}),
+                    style: new ol.style.Style({
+                        fill: new ol.style.Fill({
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: '#ffcc33',
+                            width: 2
+                        }),
+                        image: new ol.style.Circle({
+                            radius: 7,
+                            fill: new ol.style.Fill({
+                                color: '#ffcc33'
+                            })
+                        })
+                    })
+                });
+                featureOverlay.setMap(map_ref);
+                this._NewPolygonLayer = featureOverlay;
+                const modify = new ol.interaction.Modify({
+                    features: features,
+                    // the SHIFT key must be pressed to delete vertices, so
+                    // that new vertices can be drawn at the same position
+                    // of existing vertices
+                    deleteCondition: function (event) {
+                        return ol.events.condition.shiftKeyOnly(event) &&
+                            ol.events.condition.singleClick(event);
+                    }
+                });
+                map_ref.addInteraction(modify);
+                const draw = new ol.interaction.Draw({
+                    features: features, //vectorSource.getFeatures(), //TODO find the correct object to pass
+                    type: 'Polygon' /** @type {ol.geom.GeometryType} */
+                });
+                draw.on('drawend', function (e) {
+                    let currentFeature = e.feature;//this is the feature fired the event
+                    const formatWKT = new ol.format.WKT();
+                    console.log(formatWKT.writeFeature(currentFeature));
+                    //debugger;
+                });
+                this._interactionModify = modify;
+                this._interactionDraw = draw;
+                map_ref.addInteraction(draw);
+            }
+
+            "use strict";
+            const map_ref = this._olMap;
+            const previous_mode = this._current_mode;
+            this._current_mode = newMode;
+            switch (newMode) {
+                case 'NAVIGATE':
+                    if (previous_mode == 'EDIT') {
+                        map_ref.removeInteraction(this._interactionSelect);
+                        map_ref.removeInteraction(this._interactionModifyEdit);
+                    }
+                    if (previous_mode == 'CREATE') {
+                        map_ref.removeInteraction(this._interactionDraw);
+                        map_ref.removeInteraction(this._interactionModify);
+                    }
+                    break;
+                case 'CREATE':
+                    if (previous_mode == 'EDIT') {
+                        map_ref.removeInteraction(this._interactionSelect);
+                        map_ref.removeInteraction(this._interactionModifyEdit);
+                    }
+                    const features = new ol.Collection();
+                    const featureOverlay = new ol.layer.Vector({
+                        source: new ol.source.Vector({features: features}),
+                        style: new ol.style.Style({
+                            fill: new ol.style.Fill({
+                                color: 'rgba(255, 255, 255, 0.2)'
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: '#ffcc33',
+                                width: 2
+                            }),
+                            image: new ol.style.Circle({
+                                radius: 7,
+                                fill: new ol.style.Fill({
+                                    color: '#ffcc33'
+                                })
+                            })
+                        })
+                    });
+                    featureOverlay.setMap(map_ref);
+                    this._NewPolygonLayer = featureOverlay;
+                    const modify = new ol.interaction.Modify({
+                        features: features,
+                        // the SHIFT key must be pressed to delete vertices, so
+                        // that new vertices can be drawn at the same position
+                        // of existing vertices
+                        deleteCondition: function (event) {
+                            return ol.events.condition.shiftKeyOnly(event) &&
+                                ol.events.condition.singleClick(event);
+                        }
+                    });
+                    map_ref.addInteraction(modify);
+                    const draw = new ol.interaction.Draw({
+                        features: features, //vectorSource.getFeatures(), //TODO find the correct object to pass
+                        type: 'Polygon' /** @type {ol.geom.GeometryType} */
+                    });
+                    draw.on('drawend', function (e) {
+                        let currentFeature = e.feature;//this is the feature fired the event
+                        const formatWKT = new ol.format.WKT();
+                        let featureWKTGeometry = formatWKT.writeFeature(currentFeature);
+                        console.log("INSIDE setMode(CREATE) event drawend : " + featureWKTGeometry);
+                        if (U.function_exist(endDrawCallback)) {
+                            endDrawCallback(currentFeature, featureWKTGeometry);
+                        }
+                        //debugger;
+                    });
+                    this._interactionModify = modify;
+                    this._interactionDraw = draw;
+                    map_ref.addInteraction(draw);
+                    break; // end of EDIT mode
+                case 'EDIT':
+                    if (previous_mode == 'CREATE') {
+                        map_ref.removeInteraction(this._interactionDraw);
+                        map_ref.removeInteraction(this._interactionModify);
+                    }
+                    const select = new ol.interaction.Select({wrapX: false});
+                    const modifyEdit = new ol.interaction.Modify({
+                        features: select.getFeatures(),
+                        // the SHIFT key must be pressed to delete vertices, so
+                        // that new vertices can be drawn at the same position
+                        // of existing vertices
+                        deleteCondition: function (event) {
+                            return ol.events.condition.shiftKeyOnly(event) &&
+                                ol.events.condition.singleClick(event);
+                        }
+                    });
+                    this._interactionSelect = select;
+                    this._interactionModifyEdit = modifyEdit;
+                    map_ref.addInteraction(select);
+                    map_ref.addInteraction(modifyEdit);
+                    break; // end of EDIT mode
+                default:
+                    console.log("MODE not implemented :" + newMode + "Will put in NAVIGATE Mode");
+                    if (previous_mode == 'EDIT') {
+                        map_ref.removeInteraction(this._interactionSelect);
+                        map_ref.removeInteraction(this._interactionModifyEdit);
+                    }
+                    if (previous_mode == 'CREATE') {
+                        map_ref.removeInteraction(this._interactionDraw);
+                        map_ref.removeInteraction(this._interactionModify);
+                    }
+
+            }
+
+        }, // end of setMode
 
 
         getPointInGooGleEPSG4326FromCoordTransformSwissEPSG217812: function (x, y) {
@@ -437,8 +570,6 @@ const gomap = {
             Conv4326_in_21781(x, y);
         }
         ,
-
-
     }
-    ;
+    ; // end of gomap
 export default gomap;
