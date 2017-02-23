@@ -38,7 +38,7 @@
             <a class="navbar-brand" href="#">Map</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-            <div class="navbar-form navbar-right">
+            <div class="navbar-form navbar-left">
                 <div class="form-group">
                     <select class="form-control" id="toggleMode">
                         <option value="NAVIGATE">Mode Navigation</option>
@@ -46,11 +46,24 @@
                         <option value="EDIT">Mode édition</option>
                         <!--<option value="DELETE">Mode éffacement</option>-->
                     </select>
-                    <button id="showForm" class="btn btn-primary " href="#">Formulaire</button>
-                    <button id="showInfo" class="btn btn-primary " href="#">Informations</button>
-                    <input type="search" id="searchAdd" placeholder="Entrez une adresse" class="form-control">
                 </div>
-                <button id="searchButton" class="btn btn-success">Rechercher</button>
+
+            </div>
+            <div class="navbar-form navbar-right">
+                <div class="form-group">
+
+                    <div class="btn-group">
+                        <input type="hidden" id="searchSelected" name="searchSelected">
+                        <input type="search" id="searchAdd" name="searchAdd" placeholder="Entrez une adresse"
+                               class="form-control"
+                        style="width: 22em;">
+                        <span id="searchclear"
+                              class="glyphicon glyphicon-remove-circle form-control-feedback form-control-clear"
+                              style="pointer-events: auto; text-decoration: none;cursor: pointer; font-size: 20px;"></span>
+                    </div>
+                    <button id="showForm" class="btn btn-primary " href="#">Formulaire</button>
+                    <button id="showInfo" class="btn btn-primary " href="#">GPS</button>
+                </div>
             </div>
         </div><!--/.navbar-collapse -->
     </div>
@@ -66,10 +79,6 @@
         <p>Please be patient</p>
     </span>
 <script src="dist/bundle.js"></script>
-
-
-
-
 
 
 </body>

@@ -274,12 +274,12 @@ const gomap = {
             return map;
         },
 
-        getMapRef: function () {
+       /* getMapRef: function () {
             return this._olMap;
         },
         getVieRef: function () {
             return this._olView;
-        },
+        },*/
         getGeolocationRef: function () {
             return this._geolocation;
         },

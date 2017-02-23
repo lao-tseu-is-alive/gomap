@@ -1,0 +1,16 @@
+.bc-wrapper{
+    position: relative;
+    display: inline;
+}
+
+.bc-wrapper .bc-menu{
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    display: none;
+}
+
+.input-group .bc-wrapper .bc-menu {
+    top: 8px;
+}
+

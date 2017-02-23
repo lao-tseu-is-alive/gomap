@@ -5,16 +5,17 @@
 
 import 'openlayers/css/ol.css';
 import './style/bootstrap-datetimepicker.css';
-import css from './style/base.css';
+import './style/gocomplete.css';
+import './style/base.css';
 import 'jquery';
 import moment from 'moment';
 import 'datetimepicker';
 import ol from 'openlayers';
 import gomap from './goeland_ol3_wmts';
 import * as U from './htmlUtils';
-import searchAddress from './searchAddress';
 import Form from './showFormGoChantier';
 import Info from './showInfo';
+import './gocomplete';
 
 let current_mode = 'NAVIGATE'; //default mode
 //TODO obvioulsy get the REAL id of the authenticated user
@@ -35,8 +36,6 @@ let goChantierProps = {
     "lat": null
 }
 
-// TODO implement searchAddress API and client
-searchAddress.attachEl();
 loadForm();
 loadInfo();
 ///////////////// DEBUT GESTION DES CHAMPS DATES
@@ -70,12 +69,12 @@ $("#obj_real_date_end").on("dp.change", function (e) {
 
 ///////////////// FIN GESTION DES CHAMPS DATES
 
-var lon = 537892.8;
-var lat = 152095.7;
-var zoom_level = 4;
+const lon = 537892.8;
+const lat = 152095.7;
+const zoom_level = 4;
 var position_Lausanne = [lon, lat];
 
-var map = gomap.init_map(
+const map = gomap.init_map(
     'mapdiv',
     position_Lausanne,
     zoom_level,
@@ -263,6 +262,51 @@ U.getEl('toggleMode').addEventListener('change', function (e) {
     gomap.setMode($('#toggleMode').val(), handleNewPolygon);
 
 });
+let adresses_url = '/gomap-api/adresses';
+if (DEV) {
+    adresses_url = 'https://gomap.lausanne.ch/gomap-api/adresses';
+}
+$('#searchAdd').gocomplete({
+    url: adresses_url,
+    method: 'post',
+    minLength: 4,
+    idFieldName: 'searchSelected'
+});
+
+$('#searchSelected').change(function (event) {
+        event.preventDefault();
+        const search = U.getEl('searchSelected');
+        const coord = search.value;
+        const position = coord.split('_').map(Number);
+        let current_view = map.getView();
+        current_view.setCenter(position);
+        current_view.setZoom(8);
+        $("#searchclear").show();
+    }
+);
+$("#searchclear").hide();
+
+$("#searchclear").click(function () {
+    $("#searchAdd").val('');
+    $("#searchclear").hide();
+});
+
+/*
+ U.getEl('searchButton').addEventListener('click', () => {
+ // next one allow to stop in debuger in chrome
+ //debugger;
+ const search = U.getEl('searchSelected');
+ const coord = search.value;
+ const position = coord.split('_').map(Number);
+ console.log('Your search will go to : ', position);
+
+ let current_view = map.getView();
+ current_view.setCenter(position);
+ current_view.setZoom(8);
+
+
+ });
+ */
 
 $('.clickable').on('click', function () {
     hidePanels();

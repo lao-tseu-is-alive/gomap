@@ -27,7 +27,7 @@ const Info = `
             <div class="form-group">
                 <label for="gps_coordxy" class="col-sm-4 control-label">Activer le tracking de position</label>
                 <div class="col-sm-8">
-                    <input id="track" class="form-control align-right" type="checkbox" checked>
+                    <input id="track" class="form-control align-right" type="checkbox" >
                 </div>
             </div>
         </form>

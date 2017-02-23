@@ -43,6 +43,7 @@ require __DIR__ . '/../src/middleware.php';
 
 require __DIR__ . '/../src/gomap-cinema.php';
 require __DIR__ . '/../src/gomap-chantier.php';
+require __DIR__ . '/../src/gomap-adresses.php';
 
 //////////////////////////////////////////////////////////////////////////
 $app->get('/cinemas', function (Request $request, Response $response, $args) {
@@ -63,7 +64,7 @@ $app->post('/chantier/new', function (Request $request, Response $response) {
         return $response->write($server_response);
     } else {
         $newResponse = $response->withStatus(502);
-        return $newResponse ->write($server_response);
+        return $newResponse->write($server_response);
     }
 
 });
@@ -76,7 +77,25 @@ $app->post('/chantier/save/{id}', function (Request $request, Response $response
         return $response->write($server_response);
     } else {
         $newResponse = $response->withStatus(502);
-        return $newResponse ->write($server_response);
+        return $newResponse->write($server_response);
+    }
+
+});
+
+
+$app->post('/adresses', function (Request $request, Response $response, $args) {
+    /*$search = (string)$args['search'];
+    if (strlen($search) < 3) {
+        $newResponse = $response->withStatus(502);
+        return $newResponse->write('{"error":{"reason ": "search is too short ","data":' . json_encode($search) . '}}');
+    }
+    */
+    $server_response = findAdresses($request);
+    if (strpos($server_response, '{"error":') === false) {
+        return $response->write($server_response);
+    } else {
+        $newResponse = $response->withStatus(502);
+        return $newResponse->write($server_response);
     }
 
 });
