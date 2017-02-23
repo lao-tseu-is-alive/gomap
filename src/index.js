@@ -91,7 +91,7 @@ if (DEV) {
 } else {
     var geojson_url = '/gomap-api/chantiers';
 }
-//TODO handle inserts of NEW polygon
+
 var chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
 
 
@@ -229,11 +229,13 @@ function getMapClickCoordsXY(x, y) {
 
 function handleNewPolygon(newfeature, wktgeometry) {
     "use strict";
-    U.getEl('obj_coordxy').value = wktgeometry;
+    const formatWKT = new ol.format.WKT();
+    let featureWKTGeometry = formatWKT.writeFeature(newfeature);
+    U.getEl('obj_coordxy').value = featureWKTGeometry;
     newfeature.setProperties(goChantierProps, true);
     if (DEV) {
         console.log('## Inside handleNewPolygon callback newfeature : ', newfeature);
-        console.log(wktgeometry);
+        console.log(featureWKTGeometry);
     }
     displayForm(newfeature);
 
@@ -368,16 +370,19 @@ $('#save_data').on('click', function (event) {
             $('#formFeedback')
                 .html(`LA SAUVEGARDE EST FAITE ! (nouvel id = ${jqXHR.responseText})`)
                 .addClass('alert-success');
-            U.getEl('obj_idgochantier').value = jqXHR.responseText;
-            U.getEl('info_idgochantier').innerText = `(id:${jqXHR.responseText})`;
-            //$('#toolbar_status').focus();
-            /*
-             ol_controls['polygon'].deactivate();
-             ol_controls['modify'].deactivate();
-             // si crinou appelle cette page alors on appelle sa fonction avec la bbox
-             ol_vectors.refresh();
-             ol_vectors.redraw();
-             */
+            if (idgochantier === "0") {
+                U.getEl('obj_idgochantier').value = jqXHR.responseText;
+                U.getEl('info_idgochantier').innerText = `(id:${jqXHR.responseText})`;
+            }
+
+            map.removeLayer(chantier_layer);
+            //TODO il faut arriver a vider la couche utilisee pour creer nouveau polygon
+            gomap.clearTempLayers();
+            chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
+
+            hidePanels();
+            clearFormValue();
+
         },
         error: function (jqXHR, textStatus, errorThrown) {
             //alert("## POST error ##\n textStatus :" + textStatus + "\n ajaxError : " + errorThrown.toString());

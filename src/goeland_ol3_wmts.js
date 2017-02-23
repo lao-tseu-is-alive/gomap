@@ -324,7 +324,8 @@ const gomap = {
                     //TODO maybe add "loading icon" and here where to hide it
                     // retrieve extent of all features to zoom only when loading of the layer via Ajax XHR is complete
                     var extent = newLayer.getSource().getExtent();
-                    //TODO activate insert/edit toolbar buttons only when layer has finished loading
+                    // here is god place to activate insert/edit toolbar buttons
+                    // only when layer has finished loading
                     if (DEV) {
                         console.log("# Finished Loading Layer :" + geojson_url, e);
                     }
@@ -336,7 +337,7 @@ const gomap = {
             return newLayer;
         },
 
-        // TODO: have a nice way of handling editing features  2 modes possible: SELECT & Modify OR ADD
+
         loadGeoJSONPolygonLayer: function (geojson_url) {
             "use strict";
 
@@ -492,7 +493,9 @@ const gomap = {
                         })
                     });
                     featureOverlay.setMap(map_ref);
+
                     this._NewPolygonLayer = featureOverlay;
+                    this._NewPolygonCollectionFeatures = features;
                     const modify = new ol.interaction.Modify({
                         features: features,
                         // the SHIFT key must be pressed to delete vertices, so
@@ -514,7 +517,7 @@ const gomap = {
                         let featureWKTGeometry = formatWKT.writeFeature(currentFeature);
                         console.log("INSIDE setMode(CREATE) event drawend : " + featureWKTGeometry);
                         if (U.function_exist(endDrawCallback)) {
-                            endDrawCallback(currentFeature, featureWKTGeometry);
+                            endDrawCallback(currentFeature);
                         }
                         //debugger;
                     });
@@ -558,6 +561,18 @@ const gomap = {
 
         }, // end of setMode
 
+
+        clearTempLayers: function(){
+            "use strict";
+            const map_ref = this._olMap;
+            //map_ref.removeLayer(this._NewPolygonLayer);
+            //manually remove features from the source
+            this._NewPolygonCollectionFeatures.clear();
+            /*
+            this._NewPolygonLayer.forEachFeature(function(feature){
+                this._NewPolygonLayer.removeFeature(feature);
+            });*/
+        },
 
         getPointInGooGleEPSG4326FromCoordTransformSwissEPSG217812: function (x, y) {
             "use strict";
