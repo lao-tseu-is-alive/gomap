@@ -274,12 +274,12 @@ const gomap = {
             return map;
         },
 
-       /* getMapRef: function () {
-            return this._olMap;
-        },
-        getVieRef: function () {
-            return this._olView;
-        },*/
+        /* getMapRef: function () {
+         return this._olMap;
+         },
+         getVieRef: function () {
+         return this._olView;
+         },*/
         getGeolocationRef: function () {
             return this._geolocation;
         },
@@ -403,7 +403,7 @@ const gomap = {
             vector_source.addFeature(feature);
         },
 
-        setMode: function (newMode, endDrawCallback) {
+        setMode: function (newMode, endDrawCallback, endModifyCallback) {
             function addNewPolygon2Layer(layer, callbackOnDrawEnd) {
                 const map_ref = this._olMap;
                 const features = new ol.Collection();
@@ -454,6 +454,67 @@ const gomap = {
             }
 
             "use strict";
+            const overlayStyle = (function () {
+                /* jshint -W069 */
+                const styles = {};
+                styles['Polygon'] = [
+                    new ol.style.Style({
+                        fill: new ol.style.Fill({
+                            color: [255, 255, 255, 0.5]
+                        })
+                    }),
+                    new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: [255, 255, 255, 1],
+                            width: 5
+                        })
+                    }),
+                    new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: [0, 153, 255, 1],
+                            width: 3
+                        })
+                    })];
+                styles['MultiPolygon'] = styles['Polygon'];
+
+                styles['LineString'] = [
+                    new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: [255, 255, 255, 1],
+                            width: 5
+                        })
+                    }),
+                    new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: [0, 153, 255, 1],
+                            width: 3
+                        })
+                    })];
+                styles['MultiLineString'] = styles['LineString'];
+
+                styles['Point'] = [
+                    new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: 7,
+                            fill: new ol.style.Fill({
+                                color: [0, 153, 255, 1]
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: [255, 255, 255, 0.75],
+                                width: 1.5
+                            })
+                        }),
+                        zIndex: 100000
+                    })];
+                styles['MultiPoint'] = styles['Point'];
+
+                styles['GeometryCollection'] = styles['Polygon'].concat(styles['Point']);
+
+                return function (feature, resolution) {
+                    return styles[feature.getGeometry().getType()];
+                };
+                /* jshint +W069 */
+            })();
             const map_ref = this._olMap;
             const previous_mode = this._current_mode;
             this._current_mode = newMode;
@@ -530,9 +591,31 @@ const gomap = {
                         map_ref.removeInteraction(this._interactionDraw);
                         map_ref.removeInteraction(this._interactionModify);
                     }
-                    const select = new ol.interaction.Select({wrapX: false});
+                    const select = new ol.interaction.Select({
+                        wrapX: false,
+                        style: overlayStyle
+                    });
+                    /* The modify interaction does not listen to geometry change events.
+                     Changing the feature coordinates will make the modify interaction
+                     unaware of the actual feature coordinates.
+                     A possible fix: Maintain a collection used by Modify, so we can reload
+                     the features manually. This collection will always contain the same
+                     features as the select interaction.
+                     http://stackoverflow.com/questions/26878659/openlayers-3-how-to-register-feature-modified-event-as-featuremodified-in-open
+                     */
+                    var selectSource = new ol.Collection();
+                    select.on('select', function (evt) {
+                        evt.selected.forEach(function (feature) {
+                            selectSource.push(feature);
+                        });
+                        evt.deselected.forEach(function (feature) {
+                            selectSource.remove(feature);
+                        });
+                    });
                     const modifyEdit = new ol.interaction.Modify({
-                        features: select.getFeatures(),
+                        //features: select.getFeatures(),
+                        features: selectSource, // use our custom collection
+                        style: overlayStyle,
                         // the SHIFT key must be pressed to delete vertices, so
                         // that new vertices can be drawn at the same position
                         // of existing vertices
@@ -541,6 +624,36 @@ const gomap = {
                                 ol.events.condition.singleClick(event);
                         }
                     });
+                    modifyEdit.on('modifystart', function (evt) {
+                        evt.features.forEach(function (feature) {
+                            originalCoordinates[feature] = feature.getGeometry().getCoordinates();
+                        });
+                    });
+                    var originalCoordinates = {};
+                    modifyEdit.on('modifyend', function (evt) {
+                        console.log("INSIDE setMode(EDIT) event modifyend : ", evt);
+                        evt.features.forEach(function (feature) {
+                            /*if (feature in originalCoordinates) {
+                             feature.getGeometry().setCoordinates(
+                             originalCoordinates[feature]);
+                             delete originalCoordinates[feature];
+
+                             // remove and re-add the feature to make Modify reload it's geometry
+                             selectSource.remove(feature);
+                             selectSource.push(feature);
+                             }*/
+                            let currentFeature = feature;//this is the feature fired the event
+                            const formatWKT = new ol.format.WKT();
+                            let featureWKTGeometry = formatWKT.writeFeature(currentFeature);
+                            console.log("INSIDE setMode(EDIT) event modifyend : " + featureWKTGeometry);
+                            if (U.function_exist(endModifyCallback)) {
+                                endModifyCallback(currentFeature);
+                            }
+                        });
+
+                    });
+
+
                     this._interactionSelect = select;
                     this._interactionModifyEdit = modifyEdit;
                     map_ref.addInteraction(select);
@@ -562,17 +675,18 @@ const gomap = {
         }, // end of setMode
 
 
-        clearTempLayers: function(){
+        clearTempLayers: function () {
             "use strict";
             const map_ref = this._olMap;
             //map_ref.removeLayer(this._NewPolygonLayer);
             //manually remove features from the source
             this._NewPolygonCollectionFeatures.clear();
             /*
-            this._NewPolygonLayer.forEachFeature(function(feature){
-                this._NewPolygonLayer.removeFeature(feature);
-            });*/
-        },
+             this._NewPolygonLayer.forEachFeature(function(feature){
+             this._NewPolygonLayer.removeFeature(feature);
+             });*/
+        }
+        ,
 
         getPointInGooGleEPSG4326FromCoordTransformSwissEPSG217812: function (x, y) {
             "use strict";

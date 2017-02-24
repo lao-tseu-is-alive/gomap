@@ -137,9 +137,10 @@ function clearFormValue() {
 
     $('#obj_real_date_begin').data("DateTimePicker").date(null);
     $('#obj_real_date_end').data("DateTimePicker").date(null);
+    $('#formFeedback').html('');
 }
 
-function displayForm(feature) {
+function displayForm(feature, readonly = false) {
     if (!U.isNullOrUndefined(feature)) {
         clearFormValue();
         const formatGeoJSON = new ol.format.GeoJSON();
@@ -165,8 +166,30 @@ function displayForm(feature) {
 
     if ($('#toggleMode').val() == 'NAVIGATE') {
         $('#edit_buttons').hide();
+        $('#obj_name').attr("disabled", true);
+        $('#obj_description').attr("disabled", true);
+        $('#obj_planified_date_begin').data("DateTimePicker").disable();
+        $('#obj_planified_date_end').data("DateTimePicker").disable();
+        $('#obj_real_date_begin').data("DateTimePicker").disable();
+        $('#obj_real_date_end').data("DateTimePicker").disable();
+
+        $('#obj_planified_date_begin').attr("disabled", true);
+        $('#obj_planified_date_end').attr("disabled", true);
+        $('#obj_real_date_begin').attr("disabled", true);
+        $('#obj_real_date_end').attr("disabled", true);
     } else {
         $('#edit_buttons').show();
+        $('#obj_name').attr("disabled", false);
+        $('#obj_description').attr("disabled", false);
+
+        $('#obj_planified_date_begin').data("DateTimePicker").enable();
+        $('#obj_planified_date_end').data("DateTimePicker").enable();
+        $('#obj_real_date_begin').data("DateTimePicker").enable();
+        $('#obj_real_date_end').data("DateTimePicker").enable();
+        $('#obj_planified_date_begin').attr("disabled", false);
+        $('#obj_planified_date_end').attr("disabled", false);
+        $('#obj_real_date_begin').attr("disabled", false);
+        $('#obj_real_date_end').attr("disabled", false);
     }
 
     $('#contentInfo').slideUp();
@@ -200,15 +223,15 @@ function getMapClickCoordsXY(x, y) {
         return feature;
     });
     if (!feature) {
-        // here would be a good place to handle insertion of new object
+        // no object found here
         //U.getEl('obj_coordxy').value = `POINT(${x} ${y})`;
+        if (DEV) {
+            console.log(`## In getMapClickCoordsXY(${x},${y}) - No feature found here!`);
+        }
         hidePanels();
     } else {
-        //we found a feature so display info about it
-        if ($('#toggleMode').val() == 'CREATE') {
-
-        } else {
-
+        //we found a feature so display info about it only in navigation mode for now
+        if ($('#toggleMode').val() == 'NAVIGATE') {
             if (DEV) {
                 const formatGeoJSON = new ol.format.GeoJSON();
                 const formatWKT = new ol.format.WKT();
@@ -218,15 +241,13 @@ function getMapClickCoordsXY(x, y) {
                 console.log(formatGeoJSON.writeFeature(feature));
                 console.log(formatWKT.writeFeature(feature));
             }
-
+            //TODO display form in readonly when in NAVIGATE MODE
             displayForm(feature);
         }
-
     }
-
 }
 
-
+//callback when a new polygon is created
 function handleNewPolygon(newfeature, wktgeometry) {
     "use strict";
     const formatWKT = new ol.format.WKT();
@@ -238,6 +259,19 @@ function handleNewPolygon(newfeature, wktgeometry) {
         console.log(featureWKTGeometry);
     }
     displayForm(newfeature);
+
+}
+//callback when a polygon is edited
+function handleEditPolygon(editedFeature) {
+    "use strict";
+    const formatWKT = new ol.format.WKT();
+    let featureWKTGeometry = formatWKT.writeFeature(editedFeature);
+    U.getEl('obj_coordxy').value = featureWKTGeometry;
+    if (DEV) {
+        console.log('## Inside handleEditPolygon callback editedFeature : ', editedFeature);
+        console.log(featureWKTGeometry);
+    }
+    displayForm(editedFeature);
 
 }
 //////////////////////////////////////////////////////////////////////
@@ -261,7 +295,7 @@ U.getEl('toggleMode').addEventListener('change', function (e) {
         console.log('MODE ' + $('#toggleMode').val() + ' SELECTED');
         console.log(this.selectedIndex);
     }
-    gomap.setMode($('#toggleMode').val(), handleNewPolygon);
+    gomap.setMode($('#toggleMode').val(), handleNewPolygon, handleEditPolygon);
     hidePanels();
 
 });
@@ -369,24 +403,23 @@ $('#save_data').on('click', function (event) {
 
             $('#toolbar_status').text(`SAUVEGARDE OK (id:${jqXHR.responseText})`);
             if (idgochantier === "0") {
+                // on a finit une insertion
                 U.getEl('obj_idgochantier').value = jqXHR.responseText;
                 U.getEl('info_idgochantier').innerText = `(id:${jqXHR.responseText})`;
                 $('#formFeedback')
                     .html(`INSERTION REUSSIE ! (nouvel id = ${jqXHR.responseText})`)
                     .addClass('alert-success');
-                // seulement apres une creation
+                // on nettoye la couche  temporaire apres une creation
                 gomap.clearTempLayers();
-                map.removeLayer(chantier_layer);
-                chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
-
-                hidePanels();
-                clearFormValue();
             } else {
                 $('#formFeedback')
                     .html(`SAUVEGARDE MODIFICATIONS REUSSIE !`)
                     .addClass('alert-success');
-
             }
+            map.removeLayer(chantier_layer);
+            chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
+            hidePanels();
+            clearFormValue();
         },
         error: function (jqXHR, textStatus, errorThrown) {
             //alert("## POST error ##\n textStatus :" + textStatus + "\n ajaxError : " + errorThrown.toString());
