@@ -185,11 +185,11 @@ function activateInfo() {
 
 
 function updateGeolocationInfo(geolocation) {
-    U.getEl('accuracy').innerText = geolocation.getAccuracy() + ' [m]';
-    U.getEl('altitude').innerText = geolocation.getAltitude() + ' [m]';
-    U.getEl('altitudeAccuracy').innerText = geolocation.getAltitudeAccuracy() + ' [m]';
-    U.getEl('heading').innerText = geolocation.getHeading() + ' [rad]';
-    U.getEl('speed').innerText = geolocation.getSpeed() + ' [m/s]';
+    U.getEl('accuracy').innerText = (Math.round(geolocation.getAccuracy() * 100) / 100) + ' [m]';
+    U.getEl('altitude').innerText = (Math.round(geolocation.getAltitude() * 100) / 100) + ' [m]';
+    U.getEl('altitudeAccuracy').innerText = (Math.round(geolocation.getAltitudeAccuracy() * 100) / 100) + ' [m]';
+    U.getEl('heading').innerText = (Math.round(geolocation.getHeading() * 100) / 100) + ' [rad]';
+    U.getEl('speed').innerText = (Math.round(geolocation.getSpeed() * 100) / 100) + ' [m/s]';
 }
 
 
@@ -262,6 +262,7 @@ U.getEl('toggleMode').addEventListener('change', function (e) {
         console.log(this.selectedIndex);
     }
     gomap.setMode($('#toggleMode').val(), handleNewPolygon);
+    hidePanels();
 
 });
 let adresses_url = '/gomap-api/adresses';
@@ -367,27 +368,30 @@ $('#save_data').on('click', function (event) {
             console.log(jqXHR);
 
             $('#toolbar_status').text(`SAUVEGARDE OK (id:${jqXHR.responseText})`);
-            $('#formFeedback')
-                .html(`LA SAUVEGARDE EST FAITE ! (nouvel id = ${jqXHR.responseText})`)
-                .addClass('alert-success');
             if (idgochantier === "0") {
                 U.getEl('obj_idgochantier').value = jqXHR.responseText;
                 U.getEl('info_idgochantier').innerText = `(id:${jqXHR.responseText})`;
+                $('#formFeedback')
+                    .html(`INSERTION REUSSIE ! (nouvel id = ${jqXHR.responseText})`)
+                    .addClass('alert-success');
+                // seulement apres une creation
+                gomap.clearTempLayers();
+                map.removeLayer(chantier_layer);
+                chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
+
+                hidePanels();
+                clearFormValue();
+            } else {
+                $('#formFeedback')
+                    .html(`SAUVEGARDE MODIFICATIONS REUSSIE !`)
+                    .addClass('alert-success');
+
             }
-
-            map.removeLayer(chantier_layer);
-            //TODO il faut arriver a vider la couche utilisee pour creer nouveau polygon
-            gomap.clearTempLayers();
-            chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
-
-            hidePanels();
-            clearFormValue();
-
         },
         error: function (jqXHR, textStatus, errorThrown) {
             //alert("## POST error ##\n textStatus :" + textStatus + "\n ajaxError : " + errorThrown.toString());
             $('#formFeedback')
-                .html('ERREUR PENDANT LA SAUVEGARDE EST FAITE !')
+                .html('ERREUR PENDANT LA SAUVEGARDE !')
                 .addClass('alert-danger');
             console.log("POST error with url : " + post_url);
             console.log("## POST jqXHR : ", jqXHR);

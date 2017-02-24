@@ -224,10 +224,10 @@ EOT;
             $stmt->bindParam('geom_polygon', $data['geom_polygon'] );
         }
         $stmt->execute();
-        $new_id = $dbCon->lastInsertId();
+        $info = $stmt->rowCount();
         //echo(print_r($cinemas[0]['row_to_json']));
         $dbCon = null;
-        return $new_id;
+        return $info;
 
     }
     catch (PDOException $e) {
