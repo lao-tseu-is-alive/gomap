@@ -4,25 +4,24 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- TODO remove dependency on jquery as global external only needed by clik bootstrap
-         so basic idea would be to put all bootstrap handling in webpack
-    -->
-    <script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <title>OpenLayers 3 WebApp</title>
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment-with-locales.min.js"></script>-->
-    <!-- Latest compiled and minified CSS -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#1e0678">
+    <meta name="msapplication-TileColor" content="#1e0678">
+    <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+    <meta name="theme-color" content="#1e0678">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <title>GoChantier</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
           integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script  src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous"></script>
-
 </head>
 <body>
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -46,7 +45,7 @@
                         <option value="EDIT">Mode édition</option>
                         <!--<option value="DELETE">Mode éffacement</option>-->
                     </select>
-                </div>
+                </div>lsa
 
             </div>
             <div class="navbar-form navbar-right">
@@ -56,7 +55,7 @@
                         <input type="hidden" id="searchSelected" name="searchSelected">
                         <input type="search" id="searchAdd" name="searchAdd" placeholder="Entrez une adresse"
                                class="form-control"
-                        style="width: 22em;">
+                               style="width: 22em;">
                         <span id="searchclear"
                               class="glyphicon glyphicon-remove-circle form-control-feedback form-control-clear"
                               style="pointer-events: auto; text-decoration: none;cursor: pointer; font-size: 20px;"></span>
@@ -68,16 +67,12 @@
         </div><!--/.navbar-collapse -->
     </div>
 </nav>
-
 <div id="contentForm" class="gopopup goform" style="display: none;"></div>
 <div id="contentInfo" class="gopopup goinfo" style="display: none;"></div>
-
 <div id="mapdiv"></div>
-
 <span id=loader_message><p>Loading the application...<br>
         <p>Chargement de l'application...</p><br><br>
         <p>Please be patient</p>
     </span>
-
 </body>
 </html>
