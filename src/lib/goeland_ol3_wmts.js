@@ -1,4 +1,5 @@
-import '../style/ol3-layerswitcher.css';
+//import './ol.css';
+import './ol3-layerswitcher.css';
 import ol from 'openlayers';
 import './ol3-layerswitcher';
 import * as U from './htmlUtils';

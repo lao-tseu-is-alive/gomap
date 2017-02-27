@@ -1,0 +1,37 @@
+$searchWidth : 320px;
+
+#searchclear{
+    cursor: pointer;
+    font-size: 20px;
+    position: absolute;
+    right: 20px;
+    top: 70px;
+    background-color: white;
+    opacity: 0.6;
+    color: black;
+}
+
+@media  screen and (min-width: 768px) {
+    #searchclear{
+        top: 6px;
+        left: 250px;
+    }
+}
+.bc-wrapper{
+    position: inherit;
+    top: 4px;
+    width: $searchWidth;
+    display: inline;
+}
+
+.bc-wrapper .bc-menu{
+    position: absolute;
+    z-index: 1000;
+    width: $searchWidth;
+    display: none;
+}
+
+.input-group .bc-wrapper .bc-menu {
+    top: 8px;
+}
+

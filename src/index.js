@@ -5,8 +5,7 @@
 
 import 'openlayers/css/ol.css';
 import './style/bootstrap-datetimepicker.css';
-import './style/gocomplete.css';
-import './style/base.css';
+
 import 'jquery';
 import moment from 'moment';
 import './lib/bootstrap-datetimepicker';
@@ -16,6 +15,9 @@ import * as U from './lib/htmlUtils';
 import Form from './showFormGoChantier';
 import Info from './showInfo';
 import './lib/gocomplete';
+import 'bootstrap-without-jquery';
+
+import './style/base.scss';
 
 let current_mode = 'NAVIGATE'; //default mode
 //TODO obvioulsy get the REAL id of the authenticated user
@@ -295,10 +297,12 @@ U.getEl('track').addEventListener('change', function () {
 
 U.getEl('showForm').addEventListener('click', () => {
     displayForm();
+    $('.navbar-toggle').click();
 });
 
 U.getEl('showInfo').addEventListener('click', () => {
     activateInfo();
+    $('.navbar-toggle').click()
 });
 
 U.getEl('toggleMode').addEventListener('change', function (e) {

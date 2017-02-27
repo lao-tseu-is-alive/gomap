@@ -62,8 +62,9 @@ FROM (
     coalesce(rue, '') || ' ' || coalesce(entree, '') || ' , ' ||
     coalesce(num_postal :: TEXT, '') || ' ' || coalesce(commune_abrege, '') AS label
   FROM adresse_region_lausanne_adr2
-  WHERE textsearch @@ to_tsquery(:search)
+  WHERE textsearch @@ to_tsquery(:search)  
   ORDER BY label
+  LIMIT 50
 ) as f;
 EOT;
 

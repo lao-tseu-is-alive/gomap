@@ -1,7 +1,6 @@
 /**
  * Created by cgil on 2/1/17.
  */
-import css from './style/base.css';
 const envInfo = `DEV : ${DEV.toString()} - PROD: ${PROD.toString()}`;
 
 

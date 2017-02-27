@@ -1,11 +1,6 @@
-/*
- * @name jQuery.bootcomplete
- * @projectDescription Lightweight AJAX autocomplete for Bootstrap 3
- * @author Rick Somers | http://getwebhelp.com/bootcomplete
- * @version 1.0
- * @license MIT License
- *
- */
+import './gocomplete.scss';
+
+
 (function ($) {
 
     $.fn.gocomplete = function (options) {

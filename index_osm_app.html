@@ -14,31 +14,28 @@
     <meta name="msapplication-TileColor" content="#1e0678">
     <meta name="msapplication-TileImage" content="/mstile-144x144.png">
     <meta name="theme-color" content="#1e0678">
+    <title>GoChantiers</title>
     <!-- TODO remove dependency on jquery as global external only needed by clik bootstrap
          so basic idea would be to put all bootstrap handling in webpack
-    -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <title>GoChantiers</title>
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment-with-locales.min.js"></script>-->
-    <!-- Latest compiled and minified CSS -->
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  -->
+
+
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
           integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-            crossorigin="anonymous"></script>
+            crossorigin="anonymous"></script>-->
 
 </head>
 <body>
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+            <button id="toggleMenu" type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                     aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
@@ -50,6 +47,15 @@
         <div id="navbar" class="navbar-collapse collapse">
             <div class="navbar-form navbar-left">
                 <div class="form-group">
+                    <!--<div class="btn-group">-->
+                        <input type="hidden" id="searchSelected" name="searchSelected">
+                        <input type="search" id="searchAdd" name="searchAdd"
+                               placeholder="Entrez une adresse pour vous positionner dessus"
+                               class="form-control">
+                        <span id="searchclear"
+                              class="glyphicon glyphicon-remove-circle form-control-feedback form-control-clear"
+                              style="pointer-events: auto; text-decoration: none;"></span>
+                    <!--</div>-->
                     <select class="form-control" id="toggleMode">
                         <option value="NAVIGATE">Mode Navigation</option>
                         <option value="CREATE">Mode création</option>
@@ -61,15 +67,7 @@
             </div>
             <div class="navbar-form navbar-right">
                 <div class="form-group">
-                    <div class="btn-group">
-                        <input type="hidden" id="searchSelected" name="searchSelected">
-                        <input type="search" id="searchAdd" name="searchAdd" placeholder="Entrez une adresse"
-                               class="form-control"
-                        style="width: 22em;">
-                        <span id="searchclear"
-                              class="glyphicon glyphicon-remove-circle form-control-feedback form-control-clear"
-                              style="pointer-events: auto; text-decoration: none;cursor: pointer; font-size: 20px;"></span>
-                    </div>
+
                     <button id="showForm" class="btn btn-primary " href="#">Formulaire</button>
                     <button id="showInfo" class="btn btn-primary " href="#">GPS</button>
                 </div>
