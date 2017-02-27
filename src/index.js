@@ -9,13 +9,13 @@ import './style/gocomplete.css';
 import './style/base.css';
 import 'jquery';
 import moment from 'moment';
-import 'datetimepicker';
+import './lib/bootstrap-datetimepicker';
 import ol from 'openlayers';
-import gomap from './goeland_ol3_wmts';
-import * as U from './htmlUtils';
+import gomap, {Conv4326_in_21781} from './lib/goeland_ol3_wmts';
+import * as U from './lib/htmlUtils';
 import Form from './showFormGoChantier';
 import Info from './showInfo';
-import './gocomplete';
+import './lib/gocomplete';
 
 let current_mode = 'NAVIGATE'; //default mode
 //TODO obvioulsy get the REAL id of the authenticated user
@@ -208,6 +208,17 @@ function activateInfo() {
 
 
 function updateGeolocationInfo(geolocation) {
+    const coordinates = geolocation.getPosition();
+    const P21781 = Conv4326_in_21781(coordinates[0], coordinates[1]);
+    if (DEV) {
+        console.log(coordinates);
+        console.log("geolocation updateGeolocationInfo : " + P21781.x + "," + P21781.y);
+        //debugger;
+    }
+    U.getEl('gps_coordxy').value = (Math.round(P21781.x * 100)/100)
+                        + ', ' + (Math.round(P21781.y * 100)/100);
+    U.getEl('gps_coordlonlat').value = (Math.round(coordinates[1] * 10000)/10000)
+                        + ', ' + (Math.round(coordinates[0] * 10000)/10000);
     U.getEl('accuracy').innerText = (Math.round(geolocation.getAccuracy() * 100) / 100) + ' [m]';
     U.getEl('altitude').innerText = (Math.round(geolocation.getAltitude() * 100) / 100) + ' [m]';
     U.getEl('altitudeAccuracy').innerText = (Math.round(geolocation.getAltitudeAccuracy() * 100) / 100) + ' [m]';
@@ -231,7 +242,8 @@ function getMapClickCoordsXY(x, y) {
         hidePanels();
     } else {
         //we found a feature so display info about it only in navigation mode for now
-        if ($('#toggleMode').val() == 'NAVIGATE') {
+        if ($('#toggleMode').val() == 'NAVIGATE' ||
+            $('#toggleMode').val() == 'EDIT') {
             if (DEV) {
                 const formatGeoJSON = new ol.format.GeoJSON();
                 const formatWKT = new ol.format.WKT();
@@ -241,7 +253,7 @@ function getMapClickCoordsXY(x, y) {
                 console.log(formatGeoJSON.writeFeature(feature));
                 console.log(formatWKT.writeFeature(feature));
             }
-            //TODO display form in readonly when in NAVIGATE MODE
+
             displayForm(feature);
         }
     }

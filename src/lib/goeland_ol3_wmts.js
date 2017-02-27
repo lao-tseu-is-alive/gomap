@@ -1,4 +1,4 @@
-import './style/ol3-layerswitcher.css';
+import '../style/ol3-layerswitcher.css';
 import ol from 'openlayers';
 import './ol3-layerswitcher';
 import * as U from './htmlUtils';
@@ -8,12 +8,12 @@ import proj4 from './proj4';
  expr: true
  */
 proj4.defs("EPSG:21781", "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=674.4,15.1,405.3,0,0,0,0 +units=m +no_defs");
-function Conv21781_in_4326(x, y) {
+export function Conv21781_in_4326(x, y) {
     const projSource = new proj4.Proj("EPSG:21781");
     const projDest = new proj4.Proj("EPSG:4326");
     return proj4.transform(projSource, projDest, [x, y]);
 }
-function Conv4326_in_21781(x, y) {
+export function Conv4326_in_21781(x, y) {
     const projSource = new proj4.Proj("EPSG:4326");
     const projDest = new proj4.Proj("EPSG:21781");
     return proj4.transform(projSource, projDest, [x, y]);
@@ -24,8 +24,9 @@ const gomap = {
          * @param {string} str_map_id  the div id to use ro render the map
          * @param {array} position  [x,y] position of the center of the map
          * @param {number} zoom_level
-         * @param {function} clickCallback
-         * @param {boolean} enableGeoLocation
+         * @param {function} clickCallback is the callback to handle a click event on the map
+         * @param {boolean} enableGeoLocation allows to enable/disable the geolocation tracking at startup
+         * @param {function} geolocationChangeCallback is the callback to receive geolocation change
          * @return {ol.Map} an OpenLayers Map object
          */
         init_map: function (str_map_id, position, zoom_level, clickCallback, enableGeoLocation, geolocationChangeCallback) {

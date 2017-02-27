@@ -95,7 +95,7 @@ module.exports = {
         alias: {
             // Force all modules to use the same jquery version.
             'jquery': path.join(__dirname, 'node_modules/jquery/src/jquery'),
-            'datetimepicker': path.join(__dirname, 'node_modules/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.js')
+            //'datetimepicker': path.join(__dirname, 'node_modules/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.js')
         }
     },
 

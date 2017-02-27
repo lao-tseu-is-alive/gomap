@@ -2,10 +2,8 @@
  * Created by cgil on 2/1/17.
  */
 import css from './style/base.css';
-import  messages from './messages';
 const envInfo = `DEV : ${DEV.toString()} - PROD: ${PROD.toString()}`;
-const debugInfo = DEV ? `<p>${messages.app_title}<span class="${css.boxDebug}"> ${envInfo} </span></p>` : ``;
-console.log(envInfo);
+
 
 const Info = `   
     <!-- GEOLOCATION FEEDBACK -->
@@ -18,10 +16,17 @@ const Info = `
         <form class="form-horizontal">
             <div id="info" class="alert alert-danger" style="display: none;" role="alert"></div>
             <div class="form-group">
-                <label for="gps_coordxy" class="col-sm-4 control-label">Coordonnées GPS X,Y :</label>
+                <label for="gps_coordxy" class="col-sm-4 control-label">Coordonnées Nationale GPS X,Y MN03:</label>
                 <div class="col-sm-8">
                     <input type="text" readonly class="form-control" id="gps_coordxy"
-                           placeholder="Votre position GPS X,Y">
+                           placeholder="Votre position X,Y MN03">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="gps_coordlonlat" class="col-sm-4 control-label">Latitude, Longitude :</label>
+                <div class="col-sm-8">
+                    <input type="text" readonly class="form-control" id="gps_coordlonlat"
+                           placeholder="Votre position WGS84 Latitude, Longitude">
                 </div>
             </div>
             <div class="form-group">
