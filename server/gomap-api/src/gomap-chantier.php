@@ -33,7 +33,7 @@ FROM (SELECT
                                    st_y(st_transform(geom_point, 4326)) AS lat
                                 ) AS l
                           ))                        AS properties
-            FROM gochantier AS g            
+            FROM gochantier AS g WHERE isactive = true    
            ) AS f
      ) AS fc
 EOT;

@@ -386,7 +386,7 @@ const gomap = {
                     if (DEV) {
                         console.log("# Finished Loading Layer :" + geojson_url, e);
                     }
-                    map_ref.getView().fit(extent, map_ref.getSize());
+                    //map_ref.getView().fit(extent, map_ref.getSize());
                     // and unregister the "change" listener
                     ol.Observable.unByKey(listenerKey);
                 }

@@ -1,4 +1,5 @@
-$searchWidth : 320px;
+$searchWidth : 300px;
+$searchOffset: 90px;
 
 #searchclear{
     cursor: pointer;
@@ -6,15 +7,18 @@ $searchWidth : 320px;
     position: absolute;
     right: 20px;
     top: 70px;
-    background-color: white;
     opacity: 0.6;
     color: black;
 }
 
 @media  screen and (min-width: 768px) {
+    #searchAdd{
+      width: $searchWidth;
+      left: 12px;
+    }
     #searchclear{
-        top: 6px;
-        left: 250px;
+        top: 7px;
+        left: ($searchWidth + $searchOffset);
     }
 }
 .bc-wrapper{

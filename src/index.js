@@ -2,7 +2,7 @@
  index.js main entry of webapp using webpack 2 for bundling
  */
 
-
+import 'babel-polyfill';
 import 'openlayers/css/ol.css';
 import './style/bootstrap-datetimepicker.css';
 
@@ -25,7 +25,7 @@ let current_user = 7;
 
 let goChantierProps = {
     "idgochantier": 0,
-    "nom": 'titre du nouveau chantier',
+    "nom": null,
     "description": null,
     "idcreator": current_user,
     "planified_datestart": null,
@@ -96,8 +96,13 @@ if (DEV) {
 
 var chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
 
+U.getEl('toggleMode').value = 'NAVIGATE';
+                U.getEl('info_current_mode').innerText = 'NAVIGATION';
+                gomap.setMode('NAVIGATE', handleNewPolygon, handleEditPolygon);
 
 U.getEl('loader_message').style.display = 'none';
+
+/// fin de l'initialisation et du chargement de la carte
 
 
 function loadForm() {
@@ -140,6 +145,54 @@ function clearFormValue() {
     $('#obj_real_date_begin').data("DateTimePicker").date(null);
     $('#obj_real_date_end').data("DateTimePicker").date(null);
     $('#formFeedback').html('');
+}
+
+
+function isFormValid() {
+    "use strict";
+    let strErrorMessage = 'Veuillez saisir ces champs obligatoires : ';
+    let isValid = true;
+    if (U.isEmptyField('obj_coordxy')) {
+        strErrorMessage += 'Géométrie ';
+        isValid = false;
+        U.addClass('obj_coordxy', 'fieldError');
+    } else {
+        U.delClass('obj_coordxy', 'fieldError');
+    }
+    if (U.isEmptyField('obj_name')) {
+        strErrorMessage += 'Nom, ';
+        isValid = false;
+        U.addClass('obj_name', 'fieldError');
+    } else {
+        U.delClass('obj_name', 'fieldError');
+    }
+    if (U.isEmptyField('obj_description')){
+        strErrorMessage += 'Description, ';
+        isValid = false;
+        U.addClass('obj_description', 'fieldError');
+    } else {
+        U.delClass('obj_description', 'fieldError');
+    }
+    if ($('#obj_planified_date_begin').data("DateTimePicker").date()==null){
+        strErrorMessage += 'Début prévu, ';
+        isValid = false;
+        U.addClass('obj_planified_date_begin', 'fieldError');
+    } else {
+        U.delClass('obj_planified_date_begin', 'fieldError');
+    }
+    if ($('#obj_planified_date_end').data("DateTimePicker").date() == null){
+        strErrorMessage += 'Fin prévue, ';
+        isValid = false;
+        U.addClass('obj_planified_date_end', 'fieldError');
+    } else {
+        U.delClass('obj_planified_date_end', 'fieldError');
+    }
+
+    $('#obj_real_date_begin').data("DateTimePicker").date(null);
+    $('#obj_real_date_end').data("DateTimePicker").date(null);
+    $('#formFeedback').html(strErrorMessage);
+
+    return isValid;
 }
 
 function displayForm(feature, readonly = false) {
@@ -192,7 +245,9 @@ function displayForm(feature, readonly = false) {
         $('#obj_planified_date_end').attr("disabled", false);
         $('#obj_real_date_begin').attr("disabled", false);
         $('#obj_real_date_end').attr("disabled", false);
+        U.getEl('obj_name').focus();
     }
+    $('#contentForm').css('left', '1px');
 
     $('#contentInfo').slideUp();
     $('#contentForm').slideDown();
@@ -302,7 +357,7 @@ U.getEl('showForm').addEventListener('click', () => {
 
 U.getEl('showInfo').addEventListener('click', () => {
     activateInfo();
-    $('.navbar-toggle').click()
+    $('.navbar-toggle').click();
 });
 
 U.getEl('toggleMode').addEventListener('change', function (e) {
@@ -312,7 +367,23 @@ U.getEl('toggleMode').addEventListener('change', function (e) {
         console.log(this.selectedIndex);
     }
     gomap.setMode($('#toggleMode').val(), handleNewPolygon, handleEditPolygon);
+    switch ($('#toggleMode').val()) {
+        case 'NAVIGATE':
+            U.getEl('info_current_mode').innerText = 'NAVIGATION';
+            break;
+        case 'CREATE':
+            U.getEl('info_current_mode').innerText = 'CREATION';
+            break;
+        case 'EDIT':
+            U.getEl('info_current_mode').innerText = 'EDITION';
+            break;
+        default:
+            U.getEl('info_current_mode').innerText = 'Probleme :' + $('#toggleMode').val();
+    }
+
+
     hidePanels();
+    $('.navbar-toggle').click();
 
 });
 let adresses_url = '/gomap-api/adresses';
@@ -331,6 +402,8 @@ $('#searchSelected').change(function (event) {
         const search = U.getEl('searchSelected');
         const coord = search.value;
         const position = coord.split('_').map(Number);
+        U.getEl('track').checked = false
+        gomap.getGeolocationRef().setTracking(false);
         let current_view = map.getView();
         current_view.setCenter(position);
         current_view.setZoom(8);
@@ -365,92 +438,116 @@ $('.clickable').on('click', function () {
     hidePanels();
 });
 
+$('.slide_left_button').on('click', function () {
+    $('#contentForm').animate(
+        {
+            'left':'-1000px' // move it towards the left and, probably, off-screen.
+        },1000,
+        function () {
+            $(this).slideUp('fast');
+        }
+    );
+});
+
 
 //TODO add authentication login and display SAVE only if user authenticated
 $('#save_data').on('click', function (event) {
 
-    event.preventDefault();
+    if (isFormValid()) {
 
-    // TODO: refactor this code inside the corresponding form module
+    //TODO: forbid save when there is no network connection
+        event.preventDefault();
 
-    const planed_datestart = $('#obj_planified_date_begin').data("DateTimePicker").date() === null ?
-        '' : $('#obj_planified_date_begin').data("DateTimePicker").date().format('YYYY-MM-DD');
-    const planed_dateend = $('#obj_planified_date_end').data("DateTimePicker").date() === null ?
-        '' : $('#obj_planified_date_end').data("DateTimePicker").date().format('YYYY-MM-DD');
-    const real_datestart = $('#obj_real_date_begin').data("DateTimePicker").date() === null ?
-        '' : $('#obj_real_date_begin').data("DateTimePicker").date().format('YYYY-MM-DD');
-    const real_dateend = $('#obj_real_date_end').data("DateTimePicker").date() === null ?
-        '' : $('#obj_real_date_end').data("DateTimePicker").date().format('YYYY-MM-DD');
-    const idgochantier = U.getEl('obj_idgochantier').value;
-    var params = {
-        idgochantier: idgochantier,
-        name: U.getEl('obj_name').value,
-        description: U.getEl('obj_description').value,
-        planified_datestart: planed_datestart,
-        planified_dateend: planed_dateend,
-        real_datestart: real_datestart,
-        real_dateend: real_dateend,
-        geom_polygon: U.getEl('obj_coordxy').value
-    };
+        // TODO: refactor this code inside the corresponding form module
 
-    let prefix_url = '/gomap-api/chantier/';
-    if (DEV) {
-        console.log('about to save');
-        console.log(params);
-        prefix_url = 'https://gomap.lausanne.ch/gomap-api/chantier/';
-    }
-    let post_url = prefix_url;
-    if (idgochantier === "0") {
-        post_url += 'new';  // doing an insert
-    } else {
-        post_url += 'save/' + idgochantier; // doing an update
-    }
+        const planed_datestart = $('#obj_planified_date_begin').data("DateTimePicker").date() === null ?
+            '' : $('#obj_planified_date_begin').data("DateTimePicker").date().format('YYYY-MM-DD');
+        const planed_dateend = $('#obj_planified_date_end').data("DateTimePicker").date() === null ?
+            '' : $('#obj_planified_date_end').data("DateTimePicker").date().format('YYYY-MM-DD');
+        const real_datestart = $('#obj_real_date_begin').data("DateTimePicker").date() === null ?
+            '' : $('#obj_real_date_begin').data("DateTimePicker").date().format('YYYY-MM-DD');
+        const real_dateend = $('#obj_real_date_end').data("DateTimePicker").date() === null ?
+            '' : $('#obj_real_date_end').data("DateTimePicker").date().format('YYYY-MM-DD');
+        const idgochantier = U.getEl('obj_idgochantier').value;
+        var params = {
+            idgochantier: idgochantier,
+            name: U.getEl('obj_name').value,
+            description: U.getEl('obj_description').value,
+            planified_datestart: planed_datestart,
+            planified_dateend: planed_dateend,
+            real_datestart: real_datestart,
+            real_dateend: real_dateend,
+            geom_polygon: U.getEl('obj_coordxy').value
+        };
 
-
-    var jqxhr = $.ajax({
-        type: 'POST',
-        url: post_url,
-        data: params,
-        dataType: "text",
-        success: function (data, textStatus, jqXHR) {
-            //alert("POST Success :\n textStatus :" + textStatus + "\n data : " + data);
-            console.log("POST Success with url : " + post_url);
-            console.log(jqXHR);
-
-            $('#toolbar_status').text(`SAUVEGARDE OK (id:${jqXHR.responseText})`);
-            if (idgochantier === "0") {
-                // on a finit une insertion
-                U.getEl('obj_idgochantier').value = jqXHR.responseText;
-                U.getEl('info_idgochantier').innerText = `(id:${jqXHR.responseText})`;
-                $('#formFeedback')
-                    .html(`INSERTION REUSSIE ! (nouvel id = ${jqXHR.responseText})`)
-                    .addClass('alert-success');
-                // on nettoye la couche  temporaire apres une creation
-                gomap.clearTempLayers();
-            } else {
-                $('#formFeedback')
-                    .html(`SAUVEGARDE MODIFICATIONS REUSSIE !`)
-                    .addClass('alert-success');
-            }
-            map.removeLayer(chantier_layer);
-            chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
-            hidePanels();
-            clearFormValue();
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            //alert("## POST error ##\n textStatus :" + textStatus + "\n ajaxError : " + errorThrown.toString());
-            $('#formFeedback')
-                .html('ERREUR PENDANT LA SAUVEGARDE !')
-                .addClass('alert-danger');
-            console.log("POST error with url : " + post_url);
-            console.log("## POST jqXHR : ", jqXHR);
-            console.log("## POST textStatus : ", textStatus);
-            console.log("## POST errorThrown : ", errorThrown);
-            console.log("## POST jqXHR.responseText : ", jqXHR.responseText);
+        let prefix_url = '/gomap-api/chantier/';
+        if (DEV) {
+            console.log('about to save');
+            console.log(params);
+            prefix_url = 'https://gomap.lausanne.ch/gomap-api/chantier/';
         }
-    });
+        let post_url = prefix_url;
+        if (idgochantier === "0") {
+            post_url += 'new';  // doing an insert
+        } else {
+            post_url += 'save/' + idgochantier; // doing an update
+        }
 
 
+        var jqxhr = $.ajax({
+            type: 'POST',
+            url: post_url,
+            data: params,
+            dataType: "text",
+            success: function (data, textStatus, jqXHR) {
+                if (DEV) {
+                    //alert("POST Success :\n textStatus :" + textStatus + "\n data : " + data);
+                    console.log("POST Success with url : " + post_url);
+                    console.log(jqXHR);
+
+                }
+
+
+                $('#toolbar_status').text(`SAUVEGARDE OK (id:${jqXHR.responseText})`);
+                if (idgochantier === "0") {
+                    // on a finit une insertion
+                    U.getEl('obj_idgochantier').value = jqXHR.responseText;
+                    U.getEl('info_idgochantier').innerText = `(id:${jqXHR.responseText})`;
+                    $('#formFeedback')
+                        .html(`INSERTION REUSSIE ! (nouvel id = ${jqXHR.responseText})`)
+                        .addClass('alert-success');
+                    // on nettoye la couche  temporaire apres une creation
+                    gomap.clearTempLayers();
+                } else {
+                    $('#formFeedback')
+                        .html(`SAUVEGARDE MODIFICATIONS REUSSIE !`)
+                        .addClass('alert-success');
+                }
+                map.removeLayer(chantier_layer);
+                chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
+                //hidePanels();
+                //clearFormValue();
+                // apres sauvegarde ok on repasse en mode navigation
+                U.getEl('toggleMode').value = 'NAVIGATE';
+                U.getEl('info_current_mode').innerText = 'NAVIGATION';
+                gomap.setMode('NAVIGATE', handleNewPolygon, handleEditPolygon);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                //alert("## POST error ##\n textStatus :" + textStatus + "\n ajaxError : " + errorThrown.toString());
+                $('#formFeedback')
+                    .html('ERREUR PENDANT LA SAUVEGARDE !')
+                    .addClass('alert-danger');
+                if (DEV) {
+                    console.log("POST error with url : " + post_url);
+                    console.log("## POST jqXHR : ", jqXHR);
+                    console.log("## POST textStatus : ", textStatus);
+                    console.log("## POST errorThrown : ", errorThrown);
+                    console.log("## POST jqXHR.responseText : ", jqXHR.responseText);
+                }
+            }
+        });
+
+    }
 });
 
 //////////////////////////////////////////////////////////////////////

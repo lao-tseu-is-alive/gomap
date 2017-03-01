@@ -8,6 +8,7 @@
     "build_webpack_dist": "rimraf dist && NODE_ENV=production webpack",
     "clean_dist": "rimraf dist",
     "deploy_2_vps": "rsync -rlptDv ./dist/ myvps:/var/www/gomap_gil_town/ && rsync -rlptDv ./examples/data myvps:/var/www/gomap_gil_town/ && rsync -rlptDv ./server myvps:/var/www/gomap_gil_town/",
+    "deploy_2_prod_qgis-ovh": "rsync -rlptDv ./dist/ gochantier.trouvl.info:/var/www/gochantier_trouvl_info/ && rsync -rlptDv ./server gochantier.trouvl.info:/var/www/gochantier_trouvl_info/",
     "dev_webpack_server": "NODE_ENV=development node dev-server.js",
     "start": "concurrently \"npm run tsc:w\" \"npm run lite\" ",
     "lite": "lite-server",
@@ -34,6 +35,7 @@
   },
   "homepage": "https://github.com/lao-tseu-is-alive/gomap#readme",
   "dependencies": {
+    "babel-polyfill": "^6.23.0",
     "bootstrap-without-jquery": "^1.0.5",
     "font-awesome": "^4.7.0",
     "jquery": "^3.1.1",

@@ -14,38 +14,47 @@
     <meta name="msapplication-TileImage" content="/mstile-144x144.png">
     <meta name="theme-color" content="#1e0678">
     <title>GoChantiers</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 </head>
 <body>
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
-            <button id="toggleMenu" type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+            <button id="toggleMenu" type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#navbar"
                     aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Map</a>
+            <a class="navbar-brand" href="#">Chantiers</a>
+            <span id="info_current_mode" class="navbar-brand"></span>
+            <span id="info_current_mode"></span>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <div class="navbar-form navbar-left">
                 <div class="form-group">
-                        <input type="hidden" id="searchSelected" name="searchSelected">
-                        <input type="search" id="searchAdd" name="searchAdd"
-                               placeholder="Entrez une adresse pour vous positionner dessus"
-                               class="form-control">
-                        <span id="searchclear"
-                              class="glyphicon glyphicon-remove-circle form-control-feedback form-control-clear"
-                              style="pointer-events: auto; text-decoration: none;"></span>
+                    <!--<div class="btn-group">-->
+                    <input type="hidden" id="searchSelected" name="searchSelected">
+                    <input type="search" id="searchAdd" name="searchAdd"
+                           placeholder="Entrez une adresse pour vous positionner dessus"
+                           class="form-control">
+                    <span id="searchclear"
+                          class="glyphicon glyphicon-remove-circle form-control-feedback form-control-clear"
+                          style="pointer-events: auto; text-decoration: none;"></span>
+                    <!--</div>-->
                     <select class="form-control" id="toggleMode">
                         <option value="NAVIGATE">Mode Navigation</option>
                         <option value="CREATE">Mode création</option>
                         <option value="EDIT">Mode édition</option>
+                        <!--<option value="DELETE">Mode éffacement</option>-->
                     </select>
                 </div>
+
             </div>
             <div class="navbar-form navbar-right">
                 <div class="form-group">
@@ -60,9 +69,11 @@
 <div id="contentForm" class="gopopup goform" style="display: none;"></div>
 <div id="contentInfo" class="gopopup goinfo" style="display: none;"></div>
 <div id="mapdiv"></div>
-<span id=loader_message><p>Loading the application...<br>
-        <p>Chargement de l'application...</p><br><br>
-        <p>Please be patient</p>
-    </span>
+<span id=loader_message>
+    <p>Un peu de patiente votre application se charge...</p><br><br>
+    <p>Loading the application...<br>
+    <p>Please be patient</p>
+</span>
+
 </body>
 </html>
