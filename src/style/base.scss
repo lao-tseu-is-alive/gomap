@@ -116,6 +116,10 @@ html, body {
     border: 1px double black;
 }
 
+#dropdownMenu1{
+    display: none;
+}
+
 
 @media  screen and (min-width: 768px) {
 
@@ -129,5 +133,9 @@ html, body {
     #slide_left_button{
         display: none;
     }
+    #dropdownMenu1{
+        display: inherit;
+    }
+
 }
 
