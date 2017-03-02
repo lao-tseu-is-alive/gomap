@@ -1,5 +1,5 @@
-$searchWidth : 300px;
-$searchOffset: 90px;
+$searchWidth : 280px;
+$searchOffset: 37px;
 
 #searchclear{
     cursor: pointer;
@@ -11,16 +11,7 @@ $searchOffset: 90px;
     color: black;
 }
 
-@media  screen and (min-width: 768px) {
-    #searchAdd{
-      width: $searchWidth;
-      left: 12px;
-    }
-    #searchclear{
-        top: 7px;
-        left: ($searchWidth + $searchOffset);
-    }
-}
+
 .bc-wrapper{
     position: inherit;
     top: 4px;
@@ -39,3 +30,13 @@ $searchOffset: 90px;
     top: 8px;
 }
 
+@media  screen and (min-width: 768px) {
+    #searchAdd{
+      width: $searchWidth;
+      left: 12px;
+    }
+    #searchclear{
+        top: 7px;
+        left: ($searchWidth + $searchOffset);
+    }
+}

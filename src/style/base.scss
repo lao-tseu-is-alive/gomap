@@ -120,11 +120,31 @@ html, body {
     display: none;
 }
 
+#applogo{
+
+    padding: 2px 2px 2px 2px;
+}
+
+/*#applogo img{
+    position: inherit;
+    top : 1px;
+    left: 1px;
+}
+
+nav .container-fluid{
+    padding-right: 2px;
+    padding-left: 2px;
+}*/
 
 @media  screen and (min-width: 768px) {
 
     .gopopup{
         width: 55%;
+    }
+
+    .navbar-form{
+        padding-left:10px;
+        padding-right:10px
     }
 
     #info_current_mode{

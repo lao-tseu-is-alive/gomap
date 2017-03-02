@@ -16,6 +16,7 @@ import Form from './showFormGoChantier';
 import Info from './showInfo';
 import './lib/gocomplete';
 import 'bootstrap-without-jquery';
+import logo from './images/apple-touch-icon-57x57.png';
 
 import './style/base.scss';
 
@@ -97,8 +98,10 @@ if (DEV) {
 var chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
 
 U.getEl('toggleMode').value = 'NAVIGATE';
-                U.getEl('info_current_mode').innerText = 'NAVIGATION';
-                gomap.setMode('NAVIGATE', handleNewPolygon, handleEditPolygon);
+U.getEl('info_current_mode').innerText = 'NAVIGATION';
+gomap.setMode('NAVIGATE', handleNewPolygon, handleEditPolygon);
+U.getEl('applogo').innerText= '';
+U.addImg(logo,46,46,'applogo');
 
 U.getEl('loader_message').style.display = 'none';
 

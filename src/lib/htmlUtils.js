@@ -5,16 +5,16 @@ export const getEl = (elemntId) => (document.getElementById(elemntId));
 export const function_exist = (function_name) => ((typeof(function_name) !== 'undefined') && (function_name !== null));
 export const isNullOrUndefined = (variable) => ((typeof(variable) === 'undefined') || (variable === null));
 export const isEmpty = (variable) => ((typeof(variable) === 'undefined') || (variable === null) || (variable === ''))
-export const isEmptyField = function(fieldId){
+export const isEmptyField = function (fieldId) {
     const field_value = document.getElementById(fieldId).value;
     return (typeof(field_value) === 'undefined') || (field_value === null) || (field_value === '');
 };
 
-export const addClass = function(elementId, cssClass){
+export const addClass = function (elementId, cssClass) {
     document.getElementById(elementId).className += ' ' + cssClass;
 };
-export const delClass = function(elementId, cssClass){
-    document.getElementById(elementId).className = document.getElementById(elementId).className.replace(cssClass,'').trim();
+export const delClass = function (elementId, cssClass) {
+    document.getElementById(elementId).className = document.getElementById(elementId).className.replace(cssClass, '').trim();
 };
 export const unescapeHtml = function (safe) {
     if (isNullOrUndefined(safe)) {
@@ -51,3 +51,13 @@ export const cgdebug = function () {
         debugger;
     }
 };
+
+export const addImg = function(image, height, width, idElement){
+    const elem = document.createElement("img");
+    elem.setAttribute("src", image);
+    elem.setAttribute("height", height);
+    elem.setAttribute("width", width);
+    elem.setAttribute("alt", "logo");
+    document.getElementById(idElement).appendChild(elem);
+
+}
