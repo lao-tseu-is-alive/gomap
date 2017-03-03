@@ -29,6 +29,8 @@ let goChantierProps = {
     "nom": null,
     "description": null,
     "idcreator": current_user,
+    "entiteleader": null,
+    "id_affaire_goeland" : null,
     "planified_datestart": null,
     "planified_dateend": null,
     "real_datestart": null,
@@ -172,9 +174,12 @@ function clearFormValue() {
     "use strict";
     U.getEl('info_idgochantier').innerText = '';
     U.getEl('obj_idgochantier').value = '';
+    U.getEl('info_id_affaire_goeland').innerText = '';
+    U.getEl('obj_id_affaire_goeland').value = '';
     U.getEl('obj_coordxy').value = '';
     U.getEl('obj_name').value = '';
     U.getEl('obj_description').value = '';
+    U.getEl('obj_entiteleader').value = '';
     $('#obj_planified_date_begin').data("DateTimePicker").date(null);
     $('#obj_planified_date_end').data("DateTimePicker").date(null);
 
@@ -183,6 +188,7 @@ function clearFormValue() {
     $('#formFeedback').html('');
     $('#formFeedback').hide();
     $('#toolbar_status').html('');
+    $('#div_participants').html('');
 }
 
 
@@ -248,9 +254,17 @@ function displayForm(feature, readonly = false) {
             U.getEl('obj_idgochantier').value = feature_object.idgochantier;
         }
 
+        if (U.isNullOrUndefined(feature_object.id_affaire_goeland)) {
+            U.getEl('info_id_affaire_goeland').innerText = '';
+            U.getEl('obj_id_affaire_goeland').value = null;
+        } else {
+            U.getEl('info_id_affaire_goeland').innerText = ` (Affaire Goéland:${feature_object.id_affaire_goeland})`;
+            U.getEl('obj_id_affaire_goeland').value = feature_object.id_affaire_goeland;
+        }
         U.getEl('obj_coordxy').value = formatWKT.writeFeature(feature);
         U.getEl('obj_name').value = U.unescapeHtml(feature_object.nom);
         U.getEl('obj_description').value = U.unescapeHtml(feature_object.description);
+        U.getEl('obj_entiteleader').value = U.unescapeHtml(feature_object.entiteleader);
         $('#obj_planified_date_begin').data("DateTimePicker").date(moment(feature_object.planified_datestart, 'YYYY-MM-DD'));
         $('#obj_planified_date_end').data("DateTimePicker").date(moment(feature_object.planified_dateend, 'YYYY-MM-DD'));
 
@@ -262,16 +276,39 @@ function displayForm(feature, readonly = false) {
         $('#edit_buttons').hide();
         $('#obj_name').attr("disabled", true);
         $('#obj_description').attr("disabled", true);
+        $('#obj_entiteleader').attr("disabled", true);
         $('#obj_planified_date_begin').data("DateTimePicker").disable();
         $('#obj_planified_date_end').data("DateTimePicker").disable();
         $('#obj_real_date_begin').data("DateTimePicker").disable();
         $('#obj_real_date_end').data("DateTimePicker").disable();
+        if (!U.isNullOrUndefined(feature)) {
+            const feature_object = feature.getProperties();
+            if (U.isNullOrUndefined(feature_object.real_datestart)){
+                $('#div_real_date_begin').hide();
+            } else {
+                $('#div_real_date_begin').show();
+            }
+            if (U.isNullOrUndefined(feature_object.real_dateend)){
+                $('#div_real_date_end').hide();
+            } else {
+                $('#div_real_date_end').show();
+            }
+
+
+
+            if (!U.isNullOrUndefined(feature_object.participants)){
+                $('#div_participants').html('<h4>Participants : </h4>' + feature_object.participants);
+            }
+
+        }
 
         $('#obj_planified_date_begin').attr("disabled", true);
         $('#obj_planified_date_end').attr("disabled", true);
         $('#obj_real_date_begin').attr("disabled", true);
         $('#obj_real_date_end').attr("disabled", true);
+
     } else {
+        // on est en edition ou en creation
         $('#edit_buttons').show();
         $('#obj_name').attr("disabled", false);
         $('#obj_description').attr("disabled", false);
@@ -284,7 +321,15 @@ function displayForm(feature, readonly = false) {
         $('#obj_planified_date_end').attr("disabled", false);
         $('#obj_real_date_begin').attr("disabled", false);
         $('#obj_real_date_end').attr("disabled", false);
+        $('#div_real_date_begin').show();
+        $('#div_real_date_end').show();
         U.getEl('obj_name').focus();
+    }
+
+    if (DEV) {
+        $('#div_coordxy').show();
+    } else {
+        $('#div_coordxy').hide();
     }
     $('#contentForm').css('left', '1px');
 
@@ -345,7 +390,7 @@ function getMapClickCoordsXY(x, y) {
                 const feature_object = feature.getProperties();
                 const strObj = U.dumpObject2String(feature_object);
                 console.log(`## In getMapClickCoordsXY(${x},${y}) - found feature :\n ${strObj}`);
-                console.log(formatGeoJSON.writeFeature(feature));
+                //console.log(formatGeoJSON.writeFeature(feature));
                 console.log(formatWKT.writeFeature(feature));
             }
 
