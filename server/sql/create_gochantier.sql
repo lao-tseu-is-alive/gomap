@@ -52,11 +52,12 @@ GRANT USAGE ON SEQUENCE public.gochantier_idgochantier_seq TO gomap_admin;
 INSERT INTO gochantier(nom,description,idcreator,
                       planified_datestart,planified_dateend,
                       real_datestart,real_dateend,
-                      entiteleader,participants,
+                      entiteleader,id_affaire_goeland,
+                       participants,
                        geom_polygon)
     VALUES ('Renens - Rue du Cauderay (chantier pour démo)', 'renouvellement des réseaux d''eau (distribution) et de gaz', 7,
             '2017-03-13', '2017-05-31', '2017-03-13', '2017-05-31',
-            'BGR eau potable (EAU) Lausanne',
+            'BGR eau potable (EAU) Lausanne',274002,
             '<table class="table table-striped table-bordered table-hover">
 	<thead>
 		<td>Métier</td>

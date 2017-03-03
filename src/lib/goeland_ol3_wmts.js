@@ -164,7 +164,6 @@ const gomap = {
             // gestion des click sur la carte
             map.on('click', function (evt) {
                 if (DEV) {
-                    //debugger; // to stop in browser debug
                     //console.info((evt.coordinate)); // coord nationale suisse
                     //console.info(map.getPixelFromCoordinate(evt.coordinate)); // coord pixel
                 }
@@ -216,7 +215,6 @@ const gomap = {
                 const P21781 = Conv4326_in_21781(coordinates[0], coordinates[1]);
                 if (DEV) {
                     console.log("geolocation updatePosition : " + P21781.x + "," + P21781.y);
-                    //debugger;
                 }
                 const currentPosition = [P21781.x, P21781.y];
                 const currentPointPosition = new ol.geom.Point(currentPosition);
@@ -255,7 +253,6 @@ const gomap = {
                 updatePosition(geolocation, positionFeature, accuracyFeature);
                 if (DEV) {
                     //console.log("geolocation.on('change:accuracyGeometry'", geolocation.getAccuracyGeometry());
-                    //debugger;
                 }
             });
 
@@ -585,7 +582,6 @@ const gomap = {
                         let currentFeature = e.feature;//this is the feature fired the event
                         let current_polygon = currentFeature.getGeometry();
                         multiPolygon.appendPolygon(current_polygon);
-                        debugger;
                         const formatWKT = new ol.format.WKT();
                         let multiPolygon_feature = new ol.Feature({
                             geometry: multiPolygon

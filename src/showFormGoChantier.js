@@ -11,6 +11,7 @@ const Form = `
         <h3 class="panel-title">
             Information sur ce chantier
             <span id="info_idgochantier"></span>
+            <span id="info_id_affaire_goeland"></span>
         </h3>
         <span class="pull-right clickable glyphicon glyphicon-remove"
               data-effect="slideUp">
@@ -26,6 +27,7 @@ const Form = `
         <div id="form_gochantier" class="form-horizontal">
 
             <input type="hidden" id="obj_idgochantier" name="idgochantier">
+            <input type="hidden" id="obj_id_affaire_goeland" name="id_affaire_goeland">
 
             <div class="form-group">
                 <label for="obj_name" class="col-sm-3 control-label">
@@ -49,6 +51,17 @@ const Form = `
                               placeholder="Description ou commentaire concernant ce chantier"
                               rows="3">
                     </textarea>
+                </div>
+            </div>
+            <div id="div_entiteleader" class="form-group">
+                <label for="obj_entiteleader" class="col-sm-3 control-label">
+                    Entité leader
+                </label>
+                <div class="col-sm-9">
+                    <input type="text" id="obj_entiteleader" name="entiteleader"
+                           class="form-control" readonly 
+                           placeholder="Entité leader pour ce chantier"
+                    />                    
                 </div>
             </div>
 
@@ -75,7 +88,7 @@ const Form = `
                 </div>
             </div>
 
-            <div class="col-sm-6">
+            <div id="div_real_date_begin" class="col-sm-6">
                 <div class="form-group">
                     <label for="obj_real_date_begin" class="control-label">
                         Début effectif :
@@ -86,7 +99,7 @@ const Form = `
                     />
                 </div>
             </div>
-            <div class="col-sm-6">
+            <div id="div_real_date_end" class="col-sm-6">
                 <div class="form-group">
                     <label for="obj_real_date_end" class="control-label">
                         Fin effective :
@@ -98,8 +111,11 @@ const Form = `
 
                 </div>
             </div>
+            
+            <div id="div_participants">
+            </div>
 
-            <div class="form-group">
+            <div id="div_coordxy" class="form-group">
                 <label for="obj_coordxy" class="col-sm-3 control-label">Gèométrie :</label>
                 <div class="col-sm-9">
                     <input type="text" id="obj_coordxy" name="geom_point"
