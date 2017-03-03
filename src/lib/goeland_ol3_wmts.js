@@ -32,6 +32,7 @@ const gomap = {
          */
         init_map: function (str_map_id, position, zoom_level, clickCallback, enableGeoLocation, geolocationChangeCallback) {
             'use strict';
+            this._olMap = null;
             if (typeof(enableGeoLocation) === "undefined") enableGeoLocation = true;
             var base_wmts_url = 'https://map.lausanne.ch/tiles'; //valid on internet
             var RESOLUTIONS = [50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05];
@@ -164,8 +165,8 @@ const gomap = {
             map.on('click', function (evt) {
                 if (DEV) {
                     //debugger; // to stop in browser debug
-                    console.info((evt.coordinate)); // coord nationale suisse
-                    console.info(map.getPixelFromCoordinate(evt.coordinate)); // coord pixel
+                    //console.info((evt.coordinate)); // coord nationale suisse
+                    //console.info(map.getPixelFromCoordinate(evt.coordinate)); // coord pixel
                 }
 
                 if (typeof(window.parent.getMapClickCoordsXY) === "undefined") {
@@ -340,9 +341,9 @@ const gomap = {
         },
 
 
-        loadGeoJSONPolygonLayer: function (geojson_url) {
+        loadGeoJSONPolygonLayer: function (geojson_url, load_complete_callback) {
             "use strict";
-
+            this._GeoJSONPolygonLayer = null;
             const vectorSource = new ol.source.Vector({
                 url: geojson_url,
                 format: new ol.format.GeoJSON({
@@ -383,12 +384,16 @@ const gomap = {
                     // retrieve extent of all features to zoom only when loading of the layer via Ajax XHR is complete
                     var extent = newLayer.getSource().getExtent();
                     //TODO activate insert/edit toolbar buttons only when layer has finished loading
+                    //
                     if (DEV) {
                         console.log("# Finished Loading Layer :" + geojson_url, e);
                     }
-                    //map_ref.getView().fit(extent, map_ref.getSize());
+                    map_ref.getView().fit(extent, map_ref.getSize());
                     // and unregister the "change" listener
                     ol.Observable.unByKey(listenerKey);
+                    if (U.function_exist(load_complete_callback)) {
+                        load_complete_callback(newLayer);
+                    }
                 }
             });
             return newLayer;
@@ -442,13 +447,14 @@ const gomap = {
                 map_ref.addInteraction(modify);
                 const draw = new ol.interaction.Draw({
                     features: features, //vectorSource.getFeatures(), //TODO find the correct object to pass
-                    type: 'Polygon' /** @type {ol.geom.GeometryType} */
+                    type: 'MultiPolygon' /** @type {ol.geom.GeometryType} */
                 });
                 draw.on('drawend', function (e) {
                     let currentFeature = e.feature;//this is the feature fired the event
                     const formatWKT = new ol.format.WKT();
-                    console.log(formatWKT.writeFeature(currentFeature));
-                    //debugger;
+                    if (DEV) {
+                        console.log(formatWKT.writeFeature(currentFeature));
+                    }
                 });
                 this._interactionModify = modify;
                 this._interactionDraw = draw;
@@ -536,6 +542,7 @@ const gomap = {
                         map_ref.removeInteraction(this._interactionSelect);
                         map_ref.removeInteraction(this._interactionModifyEdit);
                     }
+                    let multiPolygon = new ol.geom.MultiPolygon([]);
                     const features = new ol.Collection();
                     const featureOverlay = new ol.layer.Vector({
                         source: new ol.source.Vector({features: features}),
@@ -576,13 +583,20 @@ const gomap = {
                     });
                     draw.on('drawend', function (e) {
                         let currentFeature = e.feature;//this is the feature fired the event
+                        let current_polygon = currentFeature.getGeometry();
+                        multiPolygon.appendPolygon(current_polygon);
+                        debugger;
                         const formatWKT = new ol.format.WKT();
-                        let featureWKTGeometry = formatWKT.writeFeature(currentFeature);
-                        console.log("INSIDE setMode(CREATE) event drawend : " + featureWKTGeometry);
-                        if (U.function_exist(endDrawCallback)) {
-                            endDrawCallback(currentFeature);
+                        let multiPolygon_feature = new ol.Feature({
+                            geometry: multiPolygon
+                        });
+                        if (DEV) {
+                            let featureWKTGeometry = formatWKT.writeFeature(multiPolygon_feature);
+                            console.log("INSIDE setMode(CREATE) event drawend : " + featureWKTGeometry);
                         }
-                        //debugger;
+                        if (U.function_exist(endDrawCallback)) {
+                            endDrawCallback(multiPolygon_feature);
+                        }
                     });
                     this._interactionModify = modify;
                     this._interactionDraw = draw;
@@ -633,7 +647,9 @@ const gomap = {
                     });
                     var originalCoordinates = {};
                     modifyEdit.on('modifyend', function (evt) {
-                        console.log("INSIDE setMode(EDIT) event modifyend : ", evt);
+                        if (DEV) {
+                            console.log("INSIDE setMode(EDIT) event modifyend : ", evt);
+                        }
                         evt.features.forEach(function (feature) {
                             /*if (feature in originalCoordinates) {
                              feature.getGeometry().setCoordinates(
@@ -645,9 +661,11 @@ const gomap = {
                              selectSource.push(feature);
                              }*/
                             let currentFeature = feature;//this is the feature fired the event
-                            const formatWKT = new ol.format.WKT();
-                            let featureWKTGeometry = formatWKT.writeFeature(currentFeature);
-                            console.log("INSIDE setMode(EDIT) event modifyend : " + featureWKTGeometry);
+                            if (DEV) {
+                                const formatWKT = new ol.format.WKT();
+                                let featureWKTGeometry = formatWKT.writeFeature(currentFeature);
+                                console.log("INSIDE setMode(EDIT) event modifyend : " + featureWKTGeometry);
+                            }
                             if (U.function_exist(endModifyCallback)) {
                                 endModifyCallback(currentFeature);
                             }

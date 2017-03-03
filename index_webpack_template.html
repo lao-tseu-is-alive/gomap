@@ -31,7 +31,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Chantiers</a>
+            <span id="applogo" class="navbar-brand">Chantiers</span>
             <span id="info_current_mode" class="navbar-brand"></span>
             <span id="info_current_mode"></span>
         </div>
@@ -61,6 +61,11 @@
 
                     <button id="showForm" class="btn btn-primary " href="#">Formulaire</button>
                     <button id="showInfo" class="btn btn-primary " href="#">GPS</button>
+                    <button id="dropdownMenu1" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
+                        <i class="glyphicon glyphicon-user "></i>
+                        Login
+                        <span class="caret"></span>
+                    </button>
                 </div>
             </div>
         </div><!--/.navbar-collapse -->
@@ -70,10 +75,10 @@
 <div id="contentInfo" class="gopopup goinfo" style="display: none;"></div>
 <div id="mapdiv"></div>
 <span id=loader_message>
-    <p>Un peu de patiente votre application se charge...</p><br><br>
+    <br><br><br><br>
+    <p>Un peu de patiente pendant que votre application se charge...</p><br><br>
     <p>Loading the application...<br>
     <p>Please be patient</p>
 </span>
-
 </body>
 </html>

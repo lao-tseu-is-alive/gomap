@@ -94,19 +94,52 @@ if (DEV) {
 } else {
     var geojson_url = '/gomap-api/chantiers';
 }
+let num_features = 0;
+let chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url,
+    //callback called when loads complete
+    //good place to enable edit mode
+    function (new_layer) {
+        let arr_features = new_layer.getSource().getFeatures();
+        if (arr_features.length ==1){
+            // zoom to this unique feature
+            map.getView().fit(arr_features[0].getGeometry().getExtent(), map.getSize());
+        }
+        if (DEV) {
+            console.log(`# Finished Loading chantier_layer found ${arr_features.length} features`);
+        }
 
-var chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
+    });
 
 U.getEl('toggleMode').value = 'NAVIGATE';
 U.getEl('info_current_mode').innerText = 'NAVIGATION';
 gomap.setMode('NAVIGATE', handleNewPolygon, handleEditPolygon);
-U.getEl('applogo').innerText= '';
-U.addImg(logo,46,46,'applogo');
+U.getEl('applogo').innerText = '';
+U.addImg(logo, 46, 46, 'applogo');
 
 U.getEl('loader_message').style.display = 'none';
-
 /// fin de l'initialisation et du chargement de la carte
 
+function findFeaturebyId(layer, idFieldName, id) {
+    let source = layer.getSource();
+    let arr_features = source.getFeatures();
+    for (let i = 0; i < arr_features.length; i++) {
+        if (arr_features[i].getProperties()[idFieldName] == id) {
+            return arr_features[i];
+        }
+    }
+    return null;
+}
+
+function getFeatureExtentbyId(layer, idFieldName, id) {
+    let feature = findFeaturebyId(layer, idFieldName, id);
+    if (feature != null) {
+        return feature.getGeometry().getExtent()
+    } else {
+        return null;
+    }
+
+
+}
 
 function loadForm() {
     "use strict";
@@ -148,6 +181,8 @@ function clearFormValue() {
     $('#obj_real_date_begin').data("DateTimePicker").date(null);
     $('#obj_real_date_end').data("DateTimePicker").date(null);
     $('#formFeedback').html('');
+    $('#formFeedback').hide();
+    $('#toolbar_status').html('');
 }
 
 
@@ -169,31 +204,32 @@ function isFormValid() {
     } else {
         U.delClass('obj_name', 'fieldError');
     }
-    if (U.isEmptyField('obj_description')){
+    if (U.isEmptyField('obj_description')) {
         strErrorMessage += 'Description, ';
         isValid = false;
         U.addClass('obj_description', 'fieldError');
     } else {
         U.delClass('obj_description', 'fieldError');
     }
-    if ($('#obj_planified_date_begin').data("DateTimePicker").date()==null){
+    if ($('#obj_planified_date_begin').data("DateTimePicker").date() == null) {
         strErrorMessage += 'Début prévu, ';
         isValid = false;
         U.addClass('obj_planified_date_begin', 'fieldError');
     } else {
         U.delClass('obj_planified_date_begin', 'fieldError');
     }
-    if ($('#obj_planified_date_end').data("DateTimePicker").date() == null){
+    if ($('#obj_planified_date_end').data("DateTimePicker").date() == null) {
         strErrorMessage += 'Fin prévue, ';
         isValid = false;
         U.addClass('obj_planified_date_end', 'fieldError');
     } else {
         U.delClass('obj_planified_date_end', 'fieldError');
     }
-
-    $('#obj_real_date_begin').data("DateTimePicker").date(null);
-    $('#obj_real_date_end').data("DateTimePicker").date(null);
+    //TODO check if obj_real_date_end > #obj_real_date_begin
+    //$('#obj_real_date_begin').data("DateTimePicker").date(null);
+    //$('#obj_real_date_end').data("DateTimePicker").date(null);
     $('#formFeedback').html(strErrorMessage);
+    $('#formFeedback').show();
 
     return isValid;
 }
@@ -273,12 +309,11 @@ function updateGeolocationInfo(geolocation) {
     if (DEV) {
         console.log(coordinates);
         console.log("geolocation updateGeolocationInfo : " + P21781.x + "," + P21781.y);
-        //debugger;
     }
-    U.getEl('gps_coordxy').value = (Math.round(P21781.x * 100)/100)
-                        + ', ' + (Math.round(P21781.y * 100)/100);
-    U.getEl('gps_coordlonlat').value = (Math.round(coordinates[1] * 10000)/10000)
-                        + ', ' + (Math.round(coordinates[0] * 10000)/10000);
+    U.getEl('gps_coordxy').value = (Math.round(P21781.x * 100) / 100)
+        + ', ' + (Math.round(P21781.y * 100) / 100);
+    U.getEl('gps_coordlonlat').value = (Math.round(coordinates[1] * 10000) / 10000)
+        + ', ' + (Math.round(coordinates[0] * 10000) / 10000);
     U.getEl('accuracy').innerText = (Math.round(geolocation.getAccuracy() * 100) / 100) + ' [m]';
     U.getEl('altitude').innerText = (Math.round(geolocation.getAltitude() * 100) / 100) + ' [m]';
     U.getEl('altitudeAccuracy').innerText = (Math.round(geolocation.getAltitudeAccuracy() * 100) / 100) + ' [m]';
@@ -320,7 +355,7 @@ function getMapClickCoordsXY(x, y) {
 }
 
 //callback when a new polygon is created
-function handleNewPolygon(newfeature, wktgeometry) {
+function handleNewPolygon(newfeature) {
     "use strict";
     const formatWKT = new ol.format.WKT();
     let featureWKTGeometry = formatWKT.writeFeature(newfeature);
@@ -423,7 +458,6 @@ $("#searchclear").click(function () {
 /*
  U.getEl('searchButton').addEventListener('click', () => {
  // next one allow to stop in debuger in chrome
- //debugger;
  const search = U.getEl('searchSelected');
  const coord = search.value;
  const position = coord.split('_').map(Number);
@@ -444,8 +478,8 @@ $('.clickable').on('click', function () {
 $('.slide_left_button').on('click', function () {
     $('#contentForm').animate(
         {
-            'left':'-1000px' // move it towards the left and, probably, off-screen.
-        },1000,
+            'left': '-1000px' // move it towards the left and, probably, off-screen.
+        }, 1000,
         function () {
             $(this).slideUp('fast');
         }
@@ -455,10 +489,9 @@ $('.slide_left_button').on('click', function () {
 
 //TODO add authentication login and display SAVE only if user authenticated
 $('#save_data').on('click', function (event) {
-
     if (isFormValid()) {
 
-    //TODO: forbid save when there is no network connection
+        //TODO: forbid save when there is no network connection
         event.preventDefault();
 
         // TODO: refactor this code inside the corresponding form module
@@ -527,13 +560,20 @@ $('#save_data').on('click', function (event) {
                         .addClass('alert-success');
                 }
                 map.removeLayer(chantier_layer);
-                chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url);
+                chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url, function () {
+                    let feature_extent =getFeatureExtentbyId(chantier_layer,'idgochantier',idgochantier);
+                    map.getView().fit(feature_extent, map.getSize());
+                });
+
                 //hidePanels();
                 //clearFormValue();
                 // apres sauvegarde ok on repasse en mode navigation
                 U.getEl('toggleMode').value = 'NAVIGATE';
                 U.getEl('info_current_mode').innerText = 'NAVIGATION';
                 gomap.setMode('NAVIGATE', handleNewPolygon, handleEditPolygon);
+                //TODO passer formulaire en mode consultation
+                //displayForm(feature);
+
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 //alert("## POST error ##\n textStatus :" + textStatus + "\n ajaxError : " + errorThrown.toString());
