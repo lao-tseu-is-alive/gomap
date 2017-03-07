@@ -1,5 +1,5 @@
-$searchWidth : 280px;
-$searchOffset: 37px;
+$searchWidth : 200px;
+$searchOffset: 31px;
 
 #searchclear{
     cursor: pointer;
@@ -38,5 +38,21 @@ $searchOffset: 37px;
     #searchclear{
         top: 7px;
         left: ($searchWidth + $searchOffset);
+    }
+
+}
+
+@media  screen and (min-width: 845px) {
+    #searchAdd{
+      width: $searchWidth + 80;
+      left: 12px;
+    }
+    #searchclear{
+        top: 7px;
+        left: ($searchWidth + $searchOffset + 80);
+    }
+
+    .bc-wrapper .bc-menu{
+        width: $searchWidth + 80;
     }
 }

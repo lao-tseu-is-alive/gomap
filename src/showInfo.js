@@ -1,11 +1,11 @@
 /**
  * Created by cgil on 2/1/17.
+ * GEOLOCATION FEEDBACK
  */
 const envInfo = `DEV : ${DEV.toString()} - PROD: ${PROD.toString()}`;
 
 
-const Info = `   
-    <!-- GEOLOCATION FEEDBACK -->
+const Info = `
 <div class="panel panel-info">
     <div class="panel-heading">
         <h3 class="panel-title">Information GPS</h3>

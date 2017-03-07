@@ -22,6 +22,7 @@ import logo from './images/apple-touch-icon-57x57.png';
 import './style/base.scss';
 
 let current_mode = 'NAVIGATE'; //default mode
+const main_page_break = 768;
 
 
 
@@ -64,14 +65,16 @@ if (DEV) {
     language: {
         url: 'dataTablesFrench.json'
     },
-    ajax: 'https://gomap.lausanne.ch/gomap-api/chantiers/list'
+    ajax: 'https://gomap.lausanne.ch/gomap-api/chantiers/list',
+    lengthChange: false
 });
 } else  {
     table = $('#listData').DataTable({
     language: {
         url: 'dataTablesFrench.json'
     },
-    ajax: '/gomap-api/chantiers/list'
+    ajax: '/gomap-api/chantiers/list',
+    lengthChange: false
 });
 }
 
@@ -148,6 +151,7 @@ function loadInfo() {
 function hidePanels() {
     $('#contentInfo').slideUp();
     $('#contentForm').slideUp();
+    $('#contentList').slideUp();
 }
 
 
@@ -250,18 +254,24 @@ U.getEl('track').addEventListener('change', function () {
 
 U.getEl('showList').addEventListener('click', () => {
     displayList();
-    $('.navbar-toggle').click();
+    if (window.innerWidth < main_page_break) {
+        $('.navbar-toggle').click();
+    }
 });
 
 
 U.getEl('showForm').addEventListener('click', () => {
     Form.display();
-    $('.navbar-toggle').click();
+    if (window.innerWidth < main_page_break) {
+        $('.navbar-toggle').click();
+    }
 });
 
 U.getEl('showInfo').addEventListener('click', () => {
     activateInfo();
-    $('.navbar-toggle').click();
+    if (window.innerWidth < main_page_break) {
+        $('.navbar-toggle').click();
+    }
 });
 
 
@@ -288,7 +298,9 @@ U.getEl('toggleMode').addEventListener('change', function (e) {
 
 
     hidePanels();
-    $('.navbar-toggle').click();
+    if (window.innerWidth < main_page_break) {
+         $('.navbar-toggle').click();
+     }
 
 });
 let adresses_url = '/gomap-api/adresses';
@@ -380,10 +392,10 @@ $('#save_data').on('click', function (event) {
             '' : $('#obj_real_date_begin').data("DateTimePicker").date().format('YYYY-MM-DD');
         const real_dateend = $('#obj_real_date_end').data("DateTimePicker").date() === null ?
             '' : $('#obj_real_date_end').data("DateTimePicker").date().format('YYYY-MM-DD');
-        const idgochantier = U.getEl('obj_idgochantier').value;
+        let idgochantier = U.getEl('obj_idgochantier').value;
         //TODO obvioulsy get the REAL id of the authenticated user
         let current_user = 7;
-        var params = {
+        const params = {
             idgochantier: idgochantier,
             idcreator: current_user,
             name: U.getEl('obj_name').value,
@@ -425,6 +437,7 @@ $('#save_data').on('click', function (event) {
 
                 $('#toolbar_status').text(`SAUVEGARDE OK (id:${jqXHR.responseText})`);
                 if (idgochantier === "0") {
+                    idgochantier = parseInt(jqXHR.responseText);
                     // on a finit une insertion
                     U.getEl('obj_idgochantier').value = jqXHR.responseText;
                     U.getEl('info_idgochantier').innerText = `(id:${jqXHR.responseText})`;
@@ -442,6 +455,8 @@ $('#save_data').on('click', function (event) {
                 chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url, function () {
                     let feature_extent = gomap.getFeatureExtentbyId(chantier_layer, 'idgochantier', idgochantier);
                     map.getView().fit(feature_extent, map.getSize());
+                    // on recharge la liste des chantiers depuis la base
+                    table.ajax.reload();
                 });
 
                 // apres sauvegarde ok on repasse en mode navigation
