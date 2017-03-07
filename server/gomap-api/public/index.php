@@ -53,10 +53,20 @@ $app->get('/cinemas', function (Request $request, Response $response, $args) {
 $app->post('/cinema/new', function (Request $request, Response $response) {
     return $response->write(newCinema($request));
 });
-
+//returns geojson
 $app->get('/chantiers', function (Request $request, Response $response, $args) {
-    return $response->write(getChantiers());
+    $newResponse = $response->withHeader('Content-type', 'application/json');
+    return $newResponse->write(getChantiers());
 });
+
+$app->get('/chantiers/list', function (Request $request, Response $response, $args) {
+    $newResponse = $response->withHeader('Content-type', 'application/json');
+    return $newResponse->write(getListChantiers());
+});
+
+
+
+
 //TODO  get user id and check if it's authorized to save and then use it in idcreator binding
 $app->post('/chantier/new', function (Request $request, Response $response) {
     $server_response = newChantiers($request);

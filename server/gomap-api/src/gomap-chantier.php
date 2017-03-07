@@ -8,6 +8,13 @@
 
 require_once __DIR__ . '/../src/gomap-dbapi.php';
 
+
+function purifyJson($jsonString){
+    $pattern = array('/\n/');
+    $replace = array(' ');
+    return preg_replace($pattern, $replace, $jsonString);
+}
+
 function getChantiers(){
     $sql = <<<EOT
 SELECT row_to_json(fc)
@@ -56,6 +63,30 @@ EOT;
 }
 
 
+
+function getListChantiers(){
+    $sql = <<<EOT
+ SELECT '["' || idgochantier::TEXT || '", "' || nom || '", "' ||  description || '"]' as data
+FROM gochantier WHERE isactive = true               
+EOT;
+    try {
+        $dbCon = dbGoConnect();
+        $stmt   = $dbCon->query($sql);
+        $data = $stmt->fetchAll(PDO::FETCH_COLUMN,0);
+        //$res = '{"data":[' . join(',', $data) . ']}' ;
+        $dbCon = null;
+        $res = str_replace("\n", " ", join($data,','));
+        return '{ "data": [' . $res .']}';
+
+    }
+    catch (PDOException $e) {
+        return '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+
+}
+
+
+
 function newChantiers($request){
     $sql = <<<EOT
 INSERT INTO public.gochantier(nom, description, 
@@ -63,7 +94,7 @@ INSERT INTO public.gochantier(nom, description,
             real_datestart, real_dateend, 
             geom_polygon)
     VALUES (:name, :description, 
-            7, :planified_datestart, :planified_dateend, 
+            :idcreator, :planified_datestart, :planified_dateend, 
             :real_datestart, :real_dateend,
             st_geomfromtext(:geom_polygon,21781));
 EOT;
@@ -72,7 +103,7 @@ EOT;
     $request_data = $request->getParsedBody();
     $data = [];
     $data['name'] = filter_var(trim($request_data['name']), FILTER_SANITIZE_STRING);
-
+    $data['idcreator'] = filter_var(trim($request_data['idcreator']), FILTER_SANITIZE_NUMBER_INT);
     $data['description'] = filter_var(trim($request_data['description']), FILTER_SANITIZE_STRING);
     $data['planified_datestart'] = filter_var(trim($request_data['planified_datestart']), FILTER_SANITIZE_STRING);
     $data['planified_dateend'] = filter_var(trim($request_data['planified_dateend']), FILTER_SANITIZE_STRING);
@@ -83,10 +114,14 @@ EOT;
         $dbCon = dbGoConnect();
         $stmt   = $dbCon->prepare($sql);
         if (strlen($data['name']) < 1 ) {
-            $data['name'] = null;
-            $stmt->bindParam('name', $data['name'],PDO::PARAM_NULL );
+            return '{"error":{"reason ": "name cannot be null ","data":' . json_encode($data) . '}}';
         } else {
             $stmt->bindParam('name', $data['name'],PDO::PARAM_STR );
+        }
+        if (strlen($data['idcreator']) < 1 ) {
+            return '{"error":{"reason ": "idcreator cannot be null ","data":' . json_encode($data) . '}}';
+        } else {
+            $stmt->bindParam('idcreator', $data['idcreator'],PDO::PARAM_INT);
         }
         if (strlen($data['description']) < 1 ) {
             $data['description'] = null;
@@ -95,14 +130,12 @@ EOT;
             $stmt->bindParam('description', $data['description'] );
         }
         if (strlen($data['planified_datestart']) < 1 ) {
-            $data['planified_datestart'] = null;
-            $stmt->bindParam('planified_datestart', $data['planified_datestart'],PDO::PARAM_NULL );
+            return '{"error":{"reason ": "planified_datestart cannot be null ","data":' . json_encode($data) . '}}';
         } else {
             $stmt->bindParam('planified_datestart', $data['planified_datestart'] );
         }
         if (strlen($data['planified_dateend']) < 1 ) {
-            $data['planified_dateend'] = null;
-            $stmt->bindParam('planified_dateend', $data['planified_dateend'],PDO::PARAM_NULL );
+            return '{"error":{"reason ": "planified_dateend cannot be null ","data":' . json_encode($data) . '}}';
         } else {
             $stmt->bindParam('planified_dateend', $data['planified_dateend'] );
         }

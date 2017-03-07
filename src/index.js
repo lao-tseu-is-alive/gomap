@@ -5,14 +5,15 @@
 import 'babel-polyfill';
 import 'openlayers/css/ol.css';
 import './style/bootstrap-datetimepicker.css';
-
 import 'jquery';
-import moment from 'moment';
 import './lib/bootstrap-datetimepicker';
 import ol from 'openlayers';
 import gomap, {Conv4326_in_21781} from './lib/goeland_ol3_wmts';
 import * as U from './lib/htmlUtils';
 import Form from './showFormGoChantier';
+import List from './showListGoChantier';
+//import 'datatables.net-dt/css/jquery.dataTables.css';
+import 'datatables.net';
 import Info from './showInfo';
 import './lib/gocomplete';
 import 'bootstrap-without-jquery';
@@ -21,26 +22,10 @@ import logo from './images/apple-touch-icon-57x57.png';
 import './style/base.scss';
 
 let current_mode = 'NAVIGATE'; //default mode
-//TODO obvioulsy get the REAL id of the authenticated user
-let current_user = 7;
 
-let goChantierProps = {
-    "idgochantier": 0,
-    "nom": null,
-    "description": null,
-    "idcreator": current_user,
-    "entiteleader": null,
-    "id_affaire_goeland" : null,
-    "planified_datestart": null,
-    "planified_dateend": null,
-    "real_datestart": null,
-    "real_dateend": null,
-    "x": null,
-    "y": null,
-    "lon": null,
-    "lat": null
-}
 
+
+U.getEl('contentList').innerHTML = List;
 loadForm();
 loadInfo();
 ///////////////// DEBUT GESTION DES CHAMPS DATES
@@ -71,8 +56,25 @@ $("#obj_real_date_end").on("dp.change", function (e) {
     $('#obj_real_date_begin').data("DateTimePicker").maxDate(e.date);
 });
 
-
 ///////////////// FIN GESTION DES CHAMPS DATES
+var table ;
+if (DEV) {
+
+    table = $('#listData').DataTable({
+    language: {
+        url: 'dataTablesFrench.json'
+    },
+    ajax: 'https://gomap.lausanne.ch/gomap-api/chantiers/list'
+});
+} else  {
+    table = $('#listData').DataTable({
+    language: {
+        url: 'dataTablesFrench.json'
+    },
+    ajax: '/gomap-api/chantiers/list'
+});
+}
+
 
 const lon = 537892.8;
 const lat = 152095.7;
@@ -102,7 +104,7 @@ let chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url,
     //good place to enable edit mode
     function (new_layer) {
         let arr_features = new_layer.getSource().getFeatures();
-        if (arr_features.length ==1){
+        if (arr_features.length == 1) {
             // zoom to this unique feature
             map.getView().fit(arr_features[0].getGeometry().getExtent(), map.getSize());
         }
@@ -121,28 +123,6 @@ U.addImg(logo, 46, 46, 'applogo');
 U.getEl('loader_message').style.display = 'none';
 /// fin de l'initialisation et du chargement de la carte
 
-function findFeaturebyId(layer, idFieldName, id) {
-    let source = layer.getSource();
-    let arr_features = source.getFeatures();
-    for (let i = 0; i < arr_features.length; i++) {
-        if (arr_features[i].getProperties()[idFieldName] == id) {
-            return arr_features[i];
-        }
-    }
-    return null;
-}
-
-function getFeatureExtentbyId(layer, idFieldName, id) {
-    let feature = findFeaturebyId(layer, idFieldName, id);
-    if (feature != null) {
-        return feature.getGeometry().getExtent()
-    } else {
-        return null;
-    }
-
-
-}
-
 function loadForm() {
     "use strict";
     /* commented by cgil 8-2-2016 because System.import generates promise and IE crash
@@ -151,7 +131,7 @@ function loadForm() {
      elContent.innerHTML = pageModule.default;
      });
      */
-    U.getEl('contentForm').innerHTML = Form;
+    U.getEl('contentForm').innerHTML = Form.html;
 }
 
 function loadInfo() {
@@ -170,181 +150,17 @@ function hidePanels() {
     $('#contentForm').slideUp();
 }
 
-function clearFormValue() {
-    "use strict";
-    U.getEl('info_idgochantier').innerText = '';
-    U.getEl('obj_idgochantier').value = '';
-    U.getEl('info_id_affaire_goeland').innerText = '';
-    U.getEl('obj_id_affaire_goeland').value = '';
-    U.getEl('obj_coordxy').value = '';
-    U.getEl('obj_name').value = '';
-    U.getEl('obj_description').value = '';
-    U.getEl('obj_entiteleader').value = '';
-    $('#obj_planified_date_begin').data("DateTimePicker").date(null);
-    $('#obj_planified_date_end').data("DateTimePicker").date(null);
 
-    $('#obj_real_date_begin').data("DateTimePicker").date(null);
-    $('#obj_real_date_end').data("DateTimePicker").date(null);
-    $('#formFeedback').html('');
-    $('#formFeedback').hide();
-    $('#toolbar_status').html('');
-    $('#div_participants').html('');
-}
-
-
-function isFormValid() {
-    "use strict";
-    let strErrorMessage = 'Veuillez saisir ces champs obligatoires : ';
-    let isValid = true;
-    if (U.isEmptyField('obj_coordxy')) {
-        strErrorMessage += 'Géométrie ';
-        isValid = false;
-        U.addClass('obj_coordxy', 'fieldError');
-    } else {
-        U.delClass('obj_coordxy', 'fieldError');
-    }
-    if (U.isEmptyField('obj_name')) {
-        strErrorMessage += 'Nom, ';
-        isValid = false;
-        U.addClass('obj_name', 'fieldError');
-    } else {
-        U.delClass('obj_name', 'fieldError');
-    }
-    if (U.isEmptyField('obj_description')) {
-        strErrorMessage += 'Description, ';
-        isValid = false;
-        U.addClass('obj_description', 'fieldError');
-    } else {
-        U.delClass('obj_description', 'fieldError');
-    }
-    if ($('#obj_planified_date_begin').data("DateTimePicker").date() == null) {
-        strErrorMessage += 'Début prévu, ';
-        isValid = false;
-        U.addClass('obj_planified_date_begin', 'fieldError');
-    } else {
-        U.delClass('obj_planified_date_begin', 'fieldError');
-    }
-    if ($('#obj_planified_date_end').data("DateTimePicker").date() == null) {
-        strErrorMessage += 'Fin prévue, ';
-        isValid = false;
-        U.addClass('obj_planified_date_end', 'fieldError');
-    } else {
-        U.delClass('obj_planified_date_end', 'fieldError');
-    }
-    //TODO check if obj_real_date_end > #obj_real_date_begin
-    //$('#obj_real_date_begin').data("DateTimePicker").date(null);
-    //$('#obj_real_date_end').data("DateTimePicker").date(null);
-    $('#formFeedback').html(strErrorMessage);
-    $('#formFeedback').show();
-
-    return isValid;
-}
-
-function displayForm(feature, readonly = false) {
-    if (!U.isNullOrUndefined(feature)) {
-        clearFormValue();
-        const formatGeoJSON = new ol.format.GeoJSON();
-        const formatWKT = new ol.format.WKT();
-        const feature_object = feature.getProperties();
-        if (U.isNullOrUndefined(feature_object.idgochantier)) {
-            U.getEl('info_idgochantier').innerText = ' nouveau (pas encore sauvé !)';
-            U.getEl('obj_idgochantier').value = 0;
-        } else {
-            U.getEl('info_idgochantier').innerText = ` (id:${feature_object.idgochantier})`;
-            U.getEl('obj_idgochantier').value = feature_object.idgochantier;
-        }
-
-        if (U.isNullOrUndefined(feature_object.id_affaire_goeland)) {
-            U.getEl('info_id_affaire_goeland').innerText = '';
-            U.getEl('obj_id_affaire_goeland').value = null;
-        } else {
-            U.getEl('info_id_affaire_goeland').innerText = ` (Affaire Goéland:${feature_object.id_affaire_goeland})`;
-            U.getEl('obj_id_affaire_goeland').value = feature_object.id_affaire_goeland;
-        }
-        U.getEl('obj_coordxy').value = formatWKT.writeFeature(feature);
-        U.getEl('obj_name').value = U.unescapeHtml(feature_object.nom);
-        U.getEl('obj_description').value = U.unescapeHtml(feature_object.description);
-        U.getEl('obj_entiteleader').value = U.unescapeHtml(feature_object.entiteleader);
-        $('#obj_planified_date_begin').data("DateTimePicker").date(moment(feature_object.planified_datestart, 'YYYY-MM-DD'));
-        $('#obj_planified_date_end').data("DateTimePicker").date(moment(feature_object.planified_dateend, 'YYYY-MM-DD'));
-
-        $('#obj_real_date_begin').data("DateTimePicker").date(moment(feature_object.real_datestart, 'YYYY-MM-DD'));
-        $('#obj_real_date_end').data("DateTimePicker").date(moment(feature_object.real_dateend, 'YYYY-MM-DD'));
-    }
-
-    if ($('#toggleMode').val() == 'NAVIGATE') {
-        $('#edit_buttons').hide();
-        $('#obj_name').attr("disabled", true);
-        $('#obj_description').attr("disabled", true);
-        $('#obj_entiteleader').attr("disabled", true);
-        $('#obj_planified_date_begin').data("DateTimePicker").disable();
-        $('#obj_planified_date_end').data("DateTimePicker").disable();
-        $('#obj_real_date_begin').data("DateTimePicker").disable();
-        $('#obj_real_date_end').data("DateTimePicker").disable();
-        if (!U.isNullOrUndefined(feature)) {
-            const feature_object = feature.getProperties();
-            if (U.isNullOrUndefined(feature_object.real_datestart)){
-                $('#div_real_date_begin').hide();
-            } else {
-                $('#div_real_date_begin').show();
-            }
-            if (U.isNullOrUndefined(feature_object.real_dateend)){
-                $('#div_real_date_end').hide();
-            } else {
-                $('#div_real_date_end').show();
-            }
-
-
-
-            if (!U.isNullOrUndefined(feature_object.participants)){
-                $('#div_participants').html('<h4>Participants : </h4>' + feature_object.participants);
-            }
-
-        }
-
-        $('#obj_planified_date_begin').attr("disabled", true);
-        $('#obj_planified_date_end').attr("disabled", true);
-        $('#obj_real_date_begin').attr("disabled", true);
-        $('#obj_real_date_end').attr("disabled", true);
-
-    } else {
-        // on est en edition ou en creation
-        $('#edit_buttons').show();
-        $('#obj_name').attr("disabled", false);
-        $('#obj_description').attr("disabled", false);
-
-        $('#obj_planified_date_begin').data("DateTimePicker").enable();
-        $('#obj_planified_date_end').data("DateTimePicker").enable();
-        $('#obj_real_date_begin').data("DateTimePicker").enable();
-        $('#obj_real_date_end').data("DateTimePicker").enable();
-        $('#obj_planified_date_begin').attr("disabled", false);
-        $('#obj_planified_date_end').attr("disabled", false);
-        $('#obj_real_date_begin').attr("disabled", false);
-        $('#obj_real_date_end').attr("disabled", false);
-        $('#div_real_date_begin').show();
-        $('#div_real_date_end').show();
-        U.getEl('obj_name').focus();
-    }
-
-    if (DEV) {
-        $('#div_coordxy').show();
-    } else {
-        $('#div_coordxy').hide();
-    }
-    $('#contentForm').css('left', '1px');
-
+function displayList() {
+    $('#contentForm').slideUp();
     $('#contentInfo').slideUp();
-    $('#contentForm').slideDown();
-
-
+    $('#contentList').slideDown();
 }
 
 function activateInfo() {
     $('#contentForm').slideUp();
+    $('#contentList').slideUp();
     $('#contentInfo').slideDown();
-    //U.getEl('contentForm').style.display = 'none';
-    //U.getEl('contentInfo').style.display = '';
-
 }
 
 
@@ -393,8 +209,7 @@ function getMapClickCoordsXY(x, y) {
                 //console.log(formatGeoJSON.writeFeature(feature));
                 console.log(formatWKT.writeFeature(feature));
             }
-
-            displayForm(feature);
+            Form.display(feature);
         }
     }
 }
@@ -405,12 +220,12 @@ function handleNewPolygon(newfeature) {
     const formatWKT = new ol.format.WKT();
     let featureWKTGeometry = formatWKT.writeFeature(newfeature);
     U.getEl('obj_coordxy').value = featureWKTGeometry;
-    newfeature.setProperties(goChantierProps, true);
+    newfeature.setProperties(Form.goChantierProps, true);
     if (DEV) {
         console.log('## Inside handleNewPolygon callback newfeature : ', newfeature);
         console.log(featureWKTGeometry);
     }
-    displayForm(newfeature);
+    Form.display(newfeature);
 
 }
 //callback when a polygon is edited
@@ -423,7 +238,7 @@ function handleEditPolygon(editedFeature) {
         console.log('## Inside handleEditPolygon callback editedFeature : ', editedFeature);
         console.log(featureWKTGeometry);
     }
-    displayForm(editedFeature);
+    Form.display(editedFeature);
 
 }
 //////////////////////////////////////////////////////////////////////
@@ -433,8 +248,14 @@ U.getEl('track').addEventListener('change', function () {
     gomap.getGeolocationRef().setTracking(this.checked);
 });
 
+U.getEl('showList').addEventListener('click', () => {
+    displayList();
+    $('.navbar-toggle').click();
+});
+
+
 U.getEl('showForm').addEventListener('click', () => {
-    displayForm();
+    Form.display();
     $('.navbar-toggle').click();
 });
 
@@ -442,6 +263,7 @@ U.getEl('showInfo').addEventListener('click', () => {
     activateInfo();
     $('.navbar-toggle').click();
 });
+
 
 U.getEl('toggleMode').addEventListener('change', function (e) {
     "use strict";
@@ -532,9 +354,18 @@ $('.slide_left_button').on('click', function () {
 });
 
 
+$('#listData tbody').on('click', 'tr', function () {
+    const data = table.row(this).data();
+    const idgochantier = data[0];
+    //alert( 'You clicked on '+data[0]+'\'s row' );
+    let feature_extent = gomap.getFeatureExtentbyId(chantier_layer, 'idgochantier', idgochantier);
+    map.getView().fit(feature_extent, map.getSize());
+});
+
+
 //TODO add authentication login and display SAVE only if user authenticated
 $('#save_data').on('click', function (event) {
-    if (isFormValid()) {
+    if (Form.isValid()) {
 
         //TODO: forbid save when there is no network connection
         event.preventDefault();
@@ -550,8 +381,11 @@ $('#save_data').on('click', function (event) {
         const real_dateend = $('#obj_real_date_end').data("DateTimePicker").date() === null ?
             '' : $('#obj_real_date_end').data("DateTimePicker").date().format('YYYY-MM-DD');
         const idgochantier = U.getEl('obj_idgochantier').value;
+        //TODO obvioulsy get the REAL id of the authenticated user
+        let current_user = 7;
         var params = {
             idgochantier: idgochantier,
+            idcreator: current_user,
             name: U.getEl('obj_name').value,
             description: U.getEl('obj_description').value,
             planified_datestart: planed_datestart,
@@ -606,18 +440,16 @@ $('#save_data').on('click', function (event) {
                 }
                 map.removeLayer(chantier_layer);
                 chantier_layer = gomap.loadGeoJSONPolygonLayer(geojson_url, function () {
-                    let feature_extent =getFeatureExtentbyId(chantier_layer,'idgochantier',idgochantier);
+                    let feature_extent = gomap.getFeatureExtentbyId(chantier_layer, 'idgochantier', idgochantier);
                     map.getView().fit(feature_extent, map.getSize());
                 });
 
-                //hidePanels();
-                //clearFormValue();
                 // apres sauvegarde ok on repasse en mode navigation
                 U.getEl('toggleMode').value = 'NAVIGATE';
                 U.getEl('info_current_mode').innerText = 'NAVIGATION';
                 gomap.setMode('NAVIGATE', handleNewPolygon, handleEditPolygon);
                 //TODO passer formulaire en mode consultation
-                //displayForm(feature);
+                //Form.display(feature);
 
             },
             error: function (jqXHR, textStatus, errorThrown) {

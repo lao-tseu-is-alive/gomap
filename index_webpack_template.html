@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- http://realfavicongenerator.net/favicon_result?file_id=p1b9nn3qhj1jhf5oqevevsskb46#.WLABVt9ifmE -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
@@ -14,10 +15,21 @@
     <meta name="msapplication-TileImage" content="/mstile-144x144.png">
     <meta name="theme-color" content="#1e0678">
     <title>GoChantiers</title>
+    <!-- TODO remove dependency on jquery as global external only needed by clik bootstrap
+         so basic idea would be to put all bootstrap handling in webpack
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  -->
+
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
           integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>-->
+
 </head>
 <body>
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -58,7 +70,7 @@
             </div>
             <div class="navbar-form navbar-right">
                 <div class="form-group">
-
+                    <button id="showList" class="btn btn-primary " href="#">Liste</button>
                     <button id="showForm" class="btn btn-primary " href="#">Formulaire</button>
                     <button id="showInfo" class="btn btn-primary " href="#">GPS</button>
                     <button id="dropdownMenu1" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
@@ -71,6 +83,7 @@
         </div><!--/.navbar-collapse -->
     </div>
 </nav>
+<div id="contentList" class="gopopup golist" style="display: none;"></div>
 <div id="contentForm" class="gopopup goform" style="display: none;"></div>
 <div id="contentInfo" class="gopopup goinfo" style="display: none;"></div>
 <div id="mapdiv"></div>
