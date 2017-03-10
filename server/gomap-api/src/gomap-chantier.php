@@ -251,7 +251,7 @@ EOT;
             $data['real_dateend'] = null;
             $stmt->bindParam('real_dateend', $data['real_dateend'],PDO::PARAM_NULL );
         } else {
-            $stmt->bindParam('real_dateend', $data['planified_dateend'] );
+            $stmt->bindParam('real_dateend', $data['real_dateend'] );
         }
 
         if (strlen($data['geom_polygon']) < 1 ) {
